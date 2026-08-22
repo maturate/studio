@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+/*
+ * superOS brand palette — see superOS/Docs/brand/brand-guidelines.md.
+ * White does most of the work; every other color has one job.
+ */
+:root {
+  --background: #ffffff;
+  --foreground: #171511; /* near-black — brand copy/text */
+  --ink: #171511;
+  --brand: #004c37; /* deep green — CTAs, functional weight */
+  --brand-bright: #00aa57; /* bright green — mark/accent only */
+  --sky: #97d7f1;
+  --mint: #d3f5af;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-ink: var(--ink);
+  --color-brand: var(--brand);
+  --color-brand-bright: var(--brand-bright);
+  --color-sky: var(--sky);
+  --color-mint: var(--mint);
+  --font-sans: var(--font-plus-jakarta-sans);
+  --font-mono: var(--font-roboto-mono);
+  --font-display: var(--font-fraunces);
+  --radius-none: 0px;
+}
+
+/* Brand rule: 0px corner radius across UI elements. Circles (dots, avatars,
+   the logo mark) still use rounded-full deliberately — that's not a corner. */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--background);
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-plus-jakarta-sans), Arial, Helvetica, sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+code {
+  font-family: var(--font-roboto-mono), monospace;
+}

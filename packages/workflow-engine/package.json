@@ -1,0 +1,19 @@
+{
+  "name": "@superos/workflow-engine",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@superos/context-engine": "*",
+    "@superos/db": "*",
+    "@superos/model-registry": "*",
+    "@superos/shared": "*",
+    "@superos/storage": "*",
+    "drizzle-orm": "^0.38.3",
+    "google-auth-library": "^9.15.0"
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}

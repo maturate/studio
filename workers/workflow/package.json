@@ -1,0 +1,19 @@
+{
+  "name": "@superos/worker-workflow",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "dev": "tsx watch src/index.ts"
+  },
+  "dependencies": {
+    "@superos/db": "*",
+    "@superos/queue": "*",
+    "@superos/workflow-engine": "*",
+    "bullmq": "^5.34.6"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5"
+  }
+}

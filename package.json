@@ -1,0 +1,28 @@
+{
+  "name": "superos-workflow-studio",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "workers/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace @superos/web",
+    "build": "npm run build --workspace @superos/web",
+    "lint": "npm run lint --workspace @superos/web",
+    "db:generate": "npm run generate --workspace @superos/db",
+    "db:migrate": "npm run migrate --workspace @superos/db",
+    "db:push": "npm run push --workspace @superos/db",
+    "db:studio": "npm run studio --workspace @superos/db",
+    "db:seed": "npm run seed --workspace @superos/db",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "worker:workflow": "npm run dev --workspace @superos/worker-workflow",
+    "worker:media": "npm run dev --workspace @superos/worker-media"
+  },
+  "engines": {
+    "node": ">=20.19.0",
+    "npm": ">=10.8.2"
+  }
+}

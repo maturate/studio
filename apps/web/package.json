@@ -1,0 +1,38 @@
+{
+  "name": "@superos/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@superos/context-engine": "*",
+    "@superos/db": "*",
+    "@superos/model-registry": "*",
+    "@superos/queue": "*",
+    "@superos/shared": "*",
+    "@superos/storage": "*",
+    "@superos/workflow-engine": "*",
+    "@types/archiver": "^8.0.0",
+    "@xyflow/react": "^12.4.4",
+    "archiver": "^8.0.0",
+    "drizzle-orm": "^0.38.3",
+    "next": "16.3.1",
+    "next-auth": "5.0.0-beta.32",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.1",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
