@@ -3,11 +3,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { MODEL_REGISTRY, defaultSettingsFor, estimateCost, type ModelCategory } from "@superos/model-registry";
-import { enqueueGenerationAction, getLatestRunForModelAction, getRunOutputPreviewsAction, pollRunStatusAction } from "./actions";
+import type { DataType } from "@superos/shared";
+import { enqueueGenerationAction, getLatestRunForModelAction, getRunOutputPreviewsAction, pollRunStatusAction, resolveAssetSeedAction } from "./actions";
 import { AttachmentsPicker, type Attachment } from "./attachments-picker";
 import { SttPanel } from "./stt-panel";
 import { ScriptPanel } from "./script-panel";
 import { ModelSettingsFields } from "@/features/shared/model-settings-fields";
+import { AssetPreviewModal, type AssetCardData } from "@/features/assets/components/asset-preview-modal";
+import { getAssetPreviewDataAction } from "@/features/assets/actions";
 import type { LatestPlaygroundRun } from "./queries";
 
 const POLL_INTERVAL_MS = 1500;
@@ -54,7 +57,22 @@ export function PlaygroundForm({
     () => MODEL_REGISTRY.filter((m) => m.category === mode && m.status === "active"),
     [mode],
   );
-  const [modelId, setModelId] = useState(seed?.modelId ?? modelsForMode[0]?.id ?? "");
+  // Selected model is remembered per mode (image/audio/video) — switching tabs restores
+  // whichever model was last active there instead of resetting to that category's first
+  // model. Without this, switching away mid-generation (e.g. right after a Remix) and
+  // back loses track of the in-flight run entirely, since it's tied to a specific model
+  // id and the output panel would otherwise start looking at the wrong one.
+  const [modelIdByMode, setModelIdByMode] = useState<Record<ModelCategory, string>>(() => {
+    const firstOf = (category: ModelCategory) =>
+      MODEL_REGISTRY.find((m) => m.category === category && m.status === "active")?.id ?? "";
+    const base = { image: firstOf("image"), audio: firstOf("audio"), video: firstOf("video") };
+    if (seed) base[mode] = seed.modelId;
+    return base;
+  });
+  const modelId = modelIdByMode[mode];
+  function setModelId(id: string) {
+    setModelIdByMode((prev) => ({ ...prev, [mode]: id }));
+  }
   // Prompt is remembered per mode (image/audio/video) — switching mode restores
   // whatever was last typed there, rather than carrying over another mode's text.
   const [promptsByMode, setPromptsByMode] = useState<Record<ModelCategory, string>>(() => {
@@ -76,7 +94,18 @@ export function PlaygroundForm({
   function setSettings(next: Record<string, unknown>) {
     setSettingsByModel((prev) => ({ ...prev, [modelId]: next }));
   }
-  const [attachments, setAttachments] = useState<Attachment[]>(seed?.attachments ?? []);
+  // Attachments are remembered per model, same bucket shape as settings — switching
+  // tabs or models (including switching away mid-generation and back) must not lose
+  // a reference the user attached, since that's exactly the input a Remix/Edit or an
+  // in-flight run depends on. Only an explicit "no reference for this model yet" is
+  // an empty array; it's never forced empty on a mode/model switch.
+  const [attachmentsByModel, setAttachmentsByModel] = useState<Record<string, Attachment[]>>(() => ({
+    [modelId]: seed?.attachments ?? [],
+  }));
+  const attachments = attachmentsByModel[modelId] ?? [];
+  function setAttachments(next: Attachment[]) {
+    setAttachmentsByModel((prev) => ({ ...prev, [modelId]: next }));
+  }
   const [folderId, setFolderId] = useState<string>("");
   const isResuming = latestRun ? IN_FLIGHT_STATUSES.has(latestRun.status) : false;
   const [pending, setPending] = useState(isResuming);
@@ -84,6 +113,8 @@ export function PlaygroundForm({
   const [error, setError] = useState<string | null>(latestRun?.status === "failed" ? (latestRun.error ?? "Generation failed") : null);
   const [resultAssets, setResultAssets] = useState<LatestPlaygroundRun["outputs"]>(latestRun?.outputs ?? []);
   const [pendingCount, setPendingCount] = useState(isResuming ? (latestRun?.count ?? 1) : 0);
+  const [activeSeedAction, setActiveSeedAction] = useState<PlaygroundSeed["action"] | null>(seed?.action ?? null);
+  const [seedError, setSeedError] = useState<string | null>(null);
 
   // The output box must only ever reflect the currently selected model's own
   // history — pollUntilDone can span a model switch (it keeps running against
@@ -182,24 +213,52 @@ export function PlaygroundForm({
 
   function switchMode(next: ModelCategory) {
     setMode(next);
-    const first = MODEL_REGISTRY.find((m) => m.category === next && m.status === "active");
-    setModelId(first?.id ?? "");
-    setAttachments([]);
     setError(null);
     setResultAssets([]);
     setPending(false);
     setPendingCount(0);
     setStatusLabel(null);
+    setActiveSeedAction(null);
+    setSeedError(null);
   }
 
   function switchModel(id: string) {
     setModelId(id);
-    setAttachments([]);
     setError(null);
     setResultAssets([]);
     setPending(false);
     setPendingCount(0);
     setStatusLabel(null);
+    setActiveSeedAction(null);
+    setSeedError(null);
+  }
+
+  /** Applies an Edit/Remix seed resolved from an existing asset — same reconstruction
+   * the Asset Library's Edit/Remix links use, just applied in place instead of navigating.
+   * Deliberately leaves resultAssets/pending/statusLabel untouched — Edit/Remix only
+   * pre-fills the form, it doesn't start a generation, so whatever's currently shown
+   * in the output panel (including the very asset being edited/remixed) should stay
+   * visible until a new generation actually completes. */
+  function applySeed(next: PlaygroundSeed) {
+    const nextModel = MODEL_REGISTRY.find((m) => m.id === next.modelId);
+    if (nextModel) setMode(nextModel.category);
+    setModelId(next.modelId);
+    setPromptsByMode((prev) => ({ ...prev, [nextModel?.category ?? mode]: next.prompt }));
+    setSettingsByModel((prev) => ({ ...prev, [next.modelId]: next.settings }));
+    setAttachments(next.attachments);
+    setActiveSeedAction(next.action);
+    setSeedError(null);
+    setError(null);
+  }
+
+  async function handleEditOrRemix(assetId: string, action: "edit" | "remix") {
+    setSeedError(null);
+    const next = await resolveAssetSeedAction(assetId, action);
+    if (!next) {
+      setSeedError(action === "edit" ? "This model can't take that output back as input." : "Couldn't reconstruct the original inputs for this output.");
+      return;
+    }
+    applySeed(next);
   }
 
   const selectedModel = MODEL_REGISTRY.find((m) => m.id === modelId);
@@ -307,7 +366,7 @@ export function PlaygroundForm({
   return (
     <div className="mx-auto max-w-5xl px-6 py-10">
       {tabBar}
-      <div className="mt-8 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+      <div className="mt-8 grid gap-8 lg:grid-cols-[3fr_1fr]">
       <form
         onSubmit={handleSubmit}
         onKeyDown={(e) => {
@@ -319,10 +378,13 @@ export function PlaygroundForm({
         }}
         className="space-y-5"
       >
-        {seed && (
+        {activeSeedAction && (
           <div className="border border-ink/15 bg-ink/5 px-3 py-2 text-xs text-ink/60">
-            {seed.action === "edit" ? "Editing an asset — attached as reference below." : "Remixing a previous generation — tweak and go."}
+            {activeSeedAction === "edit" ? "Editing an asset — attached as reference below." : "Remixing a previous generation — tweak and go."}
           </div>
+        )}
+        {seedError && (
+          <div className="border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-700">{seedError}</div>
         )}
 
         <div className="space-y-1.5">
@@ -338,7 +400,6 @@ export function PlaygroundForm({
               </option>
             ))}
           </select>
-          {selectedModel?.notes && <p className="text-xs text-ink/40">{selectedModel.notes}</p>}
         </div>
 
         <div className="space-y-1.5">
@@ -423,13 +484,19 @@ export function PlaygroundForm({
         )}
 
         {(pendingCount > 0 || resultAssets.length > 0) && (
-          <div className="max-h-[560px] overflow-y-auto rounded-none border border-ink/10 bg-ink/5 p-3">
+          <div className="max-h-[calc(100vh-260px)] overflow-y-auto rounded-none border border-ink/10 bg-ink/5 p-3">
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
               {Array.from({ length: pendingCount }).map((_, i) => (
                 <div key={`pending-${i}`} className="aspect-square animate-pulse bg-ink/10" />
               ))}
               {resultAssets.map((asset) => (
-                <OutputTile key={asset.id} asset={asset} />
+                <OutputTile
+                  key={asset.id}
+                  asset={asset}
+                  canEdit={Boolean(selectedModel?.inputTypes.includes(asset.type as DataType))}
+                  onEdit={() => handleEditOrRemix(asset.id, "edit")}
+                  onRemix={() => handleEditOrRemix(asset.id, "remix")}
+                />
               ))}
             </div>
           </div>
@@ -440,43 +507,149 @@ export function PlaygroundForm({
   );
 }
 
-function OutputTile({ asset }: { asset: LatestPlaygroundRun["outputs"][number] }) {
+function OutputTile({
+  asset,
+  canEdit,
+  onEdit,
+  onRemix,
+}: {
+  asset: LatestPlaygroundRun["outputs"][number];
+  canEdit: boolean;
+  onEdit: () => void;
+  onRemix: () => void;
+}) {
+  const [previewData, setPreviewData] = useState<AssetCardData | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+
+  async function openPreview() {
+    setPreviewLoading(true);
+    try {
+      const data = await getAssetPreviewDataAction(asset.id);
+      if (data) setPreviewData(data);
+    } finally {
+      setPreviewLoading(false);
+    }
+  }
+
+  const actionBar = (
+    <div className="pointer-events-none absolute inset-x-0 bottom-0 flex gap-1 bg-gradient-to-t from-black/75 to-transparent p-1 opacity-0 transition group-hover:opacity-100">
+      {canEdit && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit();
+          }}
+          className="pointer-events-auto rounded-none bg-black/60 px-1.5 py-0.5 text-[10px] text-white hover:bg-black/80"
+        >
+          Edit
+        </button>
+      )}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onRemix();
+        }}
+        className="pointer-events-auto rounded-none bg-black/60 px-1.5 py-0.5 text-[10px] text-white hover:bg-black/80"
+      >
+        Remix
+      </button>
+    </div>
+  );
+
   if (!asset.previewUrl) {
     return <div className="flex aspect-square items-center justify-center bg-ink/10 text-[10px] text-ink/40">Preview unavailable</div>;
   }
 
+  // Image/video/generic-file tiles open the same AssetPreviewModal lightbox the Asset
+  // Library uses — clicking anywhere on the tile opens it, exactly like a library card.
   if (asset.type === "image") {
     return (
-      <a href={asset.previewUrl} target="_blank" rel="noreferrer" className="block aspect-square overflow-hidden bg-ink/10">
-        <img src={asset.previewUrl} alt="" className="h-full w-full object-cover" />
-      </a>
+      <>
+        <button type="button" onClick={openPreview} className="group relative block aspect-square overflow-hidden bg-ink/10">
+          <img src={asset.previewUrl} alt="" className="h-full w-full object-cover" />
+          {previewLoading && <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-[10px] text-white">Loading…</div>}
+          {actionBar}
+        </button>
+        {previewData && (
+          <AssetPreviewModal
+            asset={previewData}
+            onClose={() => setPreviewData(null)}
+            onEdit={() => {
+              setPreviewData(null);
+              onEdit();
+            }}
+            onRemix={() => {
+              setPreviewData(null);
+              onRemix();
+            }}
+          />
+        )}
+      </>
     );
   }
 
   if (asset.type === "video") {
     return (
-      <video src={asset.previewUrl} controls className="aspect-square w-full bg-black object-contain">
-        Your browser does not support video playback.
-      </video>
+      <>
+        <button type="button" onClick={openPreview} className="group relative block aspect-square bg-black">
+          <video src={asset.previewUrl} muted playsInline preload="metadata" className="h-full w-full object-contain" />
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-3xl text-white/90">▶</div>
+          {previewLoading && <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-[10px] text-white">Loading…</div>}
+          {actionBar}
+        </button>
+        {previewData && (
+          <AssetPreviewModal
+            asset={previewData}
+            onClose={() => setPreviewData(null)}
+            onEdit={() => {
+              setPreviewData(null);
+              onEdit();
+            }}
+            onRemix={() => {
+              setPreviewData(null);
+              onRemix();
+            }}
+          />
+        )}
+      </>
     );
   }
 
   if (asset.type === "audio") {
     return (
-      <div className="col-span-2 flex aspect-[4/1] items-center bg-ink/10 px-2 sm:col-span-3">
+      <div className="group relative col-span-2 flex aspect-[4/1] items-center bg-ink/10 px-2 sm:col-span-3">
         <audio src={asset.previewUrl} controls className="w-full" />
+        {actionBar}
       </div>
     );
   }
 
   return (
-    <a
-      href={asset.previewUrl}
-      target="_blank"
-      rel="noreferrer"
-      className="flex aspect-square items-center justify-center bg-ink/10 text-[10px] text-ink/40 hover:text-ink/70"
-    >
-      Open file →
-    </a>
+    <>
+      <button
+        type="button"
+        onClick={openPreview}
+        className="group relative flex aspect-square items-center justify-center bg-ink/10 text-[10px] text-ink/40 hover:text-ink/70"
+      >
+        Open file →
+        {actionBar}
+      </button>
+      {previewData && (
+        <AssetPreviewModal
+          asset={previewData}
+          onClose={() => setPreviewData(null)}
+          onEdit={() => {
+            setPreviewData(null);
+            onEdit();
+          }}
+          onRemix={() => {
+            setPreviewData(null);
+            onRemix();
+          }}
+        />
+      )}
+    </>
   );
 }

@@ -1,5 +1,5 @@
 import type { GenerationAdapter } from "./types";
-import { geminiImageAdapter, geminiOmniFlashAdapter, geminiTtsAdapter, veoAdapter } from "./providers/google";
+import { geminiImageAdapter, geminiOmni11FlashAdapter, geminiOmniFlashAdapter, geminiTtsAdapter, veoAdapter } from "./providers/google";
 import { elevenLabsAdapter } from "./providers/elevenlabs";
 import { klingOmniAdapter, seedanceAdapter, seedreamAdapter } from "./providers/anyfast";
 
@@ -10,6 +10,7 @@ const ADAPTERS: Record<string, GenerationAdapter> = {
   eleven_flash_v2_5: elevenLabsAdapter,
   "veo-3.1-generate-001": veoAdapter,
   "gemini-omni-flash-preview": geminiOmniFlashAdapter,
+  "gemini-omni-1.1-flash-preview": geminiOmni11FlashAdapter,
   "gemini-3.1-flash-image": geminiImageAdapter,
   "seedance-2.5": seedanceAdapter,
   "kuaishou/kling-video-3.0-omni": klingOmniAdapter,

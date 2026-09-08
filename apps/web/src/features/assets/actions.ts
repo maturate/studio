@@ -6,7 +6,7 @@ import { assetFolders, assets, db, logAudit } from "@superos/db";
 import type { AssetType } from "@superos/shared";
 import { buildAssetStorageKey, createUploadUrl, deleteObject, getObjectBuffer, putObject } from "@superos/storage";
 import { auth } from "@/lib/auth";
-import { getFolder } from "./queries";
+import { getAsset, getFolder } from "./queries";
 
 function mapMimeToAssetType(mimeType: string): AssetType {
   if (mimeType.startsWith("image/")) return "image";
@@ -195,4 +195,14 @@ export async function deleteAssetAction(assetId: string) {
     metadata: { title: asset.title },
   });
   revalidatePath("/assets");
+}
+
+/** Fetches an asset in the shape AssetPreviewModal needs — used by the Playground's
+ * output tiles so clicking a result opens the same lightbox as the Asset Library. */
+export async function getAssetPreviewDataAction(assetId: string) {
+  const session = await auth();
+  if (!session?.user?.isAuthorized) {
+    throw new Error("Not authorized");
+  }
+  return getAsset(assetId);
 }

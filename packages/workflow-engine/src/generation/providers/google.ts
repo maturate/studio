@@ -164,6 +164,48 @@ export async function geminiTtsAdapter(input: GenerationInput): Promise<Generati
  * case (text-to-video, image-to-video, reference-to-video, video editing)
  * produces video only; there is no image-output mode for this model.
  */
+/**
+ * Builds `generation_config`/`response_format` for an Interactions API
+ * request from the shared Omni settings schema (packages/model-registry/src/
+ * settings-schema.ts, OMNI_SETTINGS) — field names/shapes match Google's own
+ * SDK type definitions for CreateModelInteraction. "auto"/0 sentinels mean
+ * "omit this field" so the model falls back to its own default.
+ */
+function buildOmniRequestExtras(settings?: Record<string, unknown>): Record<string, unknown> {
+  if (!settings) return {};
+
+  const generationConfig: Record<string, unknown> = {};
+  if (typeof settings.task === "string" && settings.task !== "auto") {
+    generationConfig.video_config = { task: settings.task };
+  }
+  if (typeof settings.thinkingLevel === "string" && settings.thinkingLevel) {
+    generationConfig.thinking_level = settings.thinkingLevel;
+  }
+  if (typeof settings.seed === "number" && settings.seed !== 0) {
+    generationConfig.seed = settings.seed;
+  }
+
+  const responseFormat: Record<string, unknown> = { type: "video" };
+  let hasResponseFormat = false;
+  if (typeof settings.aspectRatio === "string" && settings.aspectRatio) {
+    responseFormat.aspect_ratio = settings.aspectRatio;
+    hasResponseFormat = true;
+  }
+  if (typeof settings.resolution === "string" && settings.resolution) {
+    responseFormat.resolution = settings.resolution;
+    hasResponseFormat = true;
+  }
+  if (typeof settings.durationSeconds === "number" && settings.durationSeconds > 0) {
+    responseFormat.duration = `${settings.durationSeconds}s`;
+    hasResponseFormat = true;
+  }
+
+  const extras: Record<string, unknown> = {};
+  if (Object.keys(generationConfig).length > 0) extras.generation_config = generationConfig;
+  if (hasResponseFormat) extras.response_format = responseFormat;
+  return extras;
+}
+
 export async function geminiOmniFlashAdapter(input: GenerationInput): Promise<GenerationResult> {
   const project = getVertexProjectId();
   const token = await getVertexAccessToken();
@@ -180,7 +222,11 @@ export async function geminiOmniFlashAdapter(input: GenerationInput): Promise<Ge
   const res = await fetch(`https://aiplatform.googleapis.com/v1beta1/projects/${project}/locations/global/interactions`, {
     method: "POST",
     headers: { "Content-Type": "application/json; charset=utf-8", Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ model: "gemini-omni-flash-preview", input: parts }),
+    body: JSON.stringify({
+      model: "gemini-omni-flash-preview",
+      input: parts,
+      ...buildOmniRequestExtras(input.settings),
+    }),
   });
   if (!res.ok) {
     throw new Error(`Gemini Omni Flash error: ${res.status} ${await res.text()}`);
@@ -205,6 +251,76 @@ export async function geminiOmniFlashAdapter(input: GenerationInput): Promise<Ge
 
   if (outputs.length === 0) {
     throw new Error("Gemini Omni Flash returned no media output");
+  }
+
+  return { outputs, providerMetadata: { raw: json } };
+}
+
+/**
+ * Gemini Omni 1.1 Flash Preview — same Interactions API surface as
+ * `gemini-omni-flash-preview` above, confirmed live against this project.
+ * Unlike the older Omni Flash, this one has confirmed image AND video
+ * reference input (fed back a real generated video and it accepted it),
+ * plus document/text-file input, but explicitly REJECTS audio input with a
+ * clear 400 from Google ("This model does not support audio input.") — so
+ * audio references must never be sent here. Output is video-only, same as
+ * the older model. `Api-Revision: 2026-05-20` matches Google's own current
+ * example for this model; omitting it also worked in testing, but sending
+ * it pins the behavior to the revision this was verified against.
+ */
+export async function geminiOmni11FlashAdapter(input: GenerationInput): Promise<GenerationResult> {
+  const project = getVertexProjectId();
+  const token = await getVertexAccessToken();
+
+  const parts: unknown[] = [];
+  if (input.prompt) parts.push({ type: "text", text: input.prompt });
+  for (const ref of input.references ?? []) {
+    if (ref.mimeType.startsWith("audio/")) {
+      throw new Error("gemini-omni-1.1-flash-preview does not support audio input/references");
+    }
+    const res = await fetch(ref.url);
+    if (!res.ok) throw new Error(`Could not fetch reference asset: ${res.status}`);
+    const buf = Buffer.from(await res.arrayBuffer());
+    const type = ref.mimeType.startsWith("video/") ? "video" : "image";
+    parts.push({ type, data: buf.toString("base64"), mime_type: ref.mimeType });
+  }
+
+  const res = await fetch(`https://aiplatform.googleapis.com/v1beta1/projects/${project}/locations/global/interactions`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      Authorization: `Bearer ${token}`,
+      "Api-Revision": "2026-05-20",
+    },
+    body: JSON.stringify({
+      model: "gemini-omni-1.1-flash-preview",
+      input: [{ type: "user_input", content: parts }],
+      ...buildOmniRequestExtras(input.settings),
+    }),
+  });
+  if (!res.ok) {
+    throw new Error(`Gemini Omni 1.1 Flash error: ${res.status} ${await res.text()}`);
+  }
+
+  const json = (await res.json()) as {
+    status?: string;
+    steps?: { type?: string; content?: { data?: string; mime_type?: string; type?: string }[] }[];
+  };
+  if (json.status !== "completed") {
+    throw new Error(`Gemini Omni 1.1 Flash returned status "${json.status}" (expected "completed")`);
+  }
+
+  const outputStep = json.steps?.find((s) => s.type === "model_output");
+  const outputs = (outputStep?.content ?? [])
+    .filter((c) => c.data && c.mime_type)
+    .map((c) => ({
+      type: "video" as const,
+      mimeType: c.mime_type!,
+      data: Buffer.from(c.data!, "base64"),
+    }));
+
+  if (outputs.length === 0) {
+    throw new Error("Gemini Omni 1.1 Flash returned no media output");
   }
 
   return { outputs, providerMetadata: { raw: json } };

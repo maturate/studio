@@ -21,7 +21,13 @@ const KIND_LABEL: Record<PickerKind, string> = {
   character: "Characters",
 };
 
-const MEDIA_DATA_TYPES = new Set(["image", "images", "audio", "video", "frames"]);
+/** The three raw file modalities, each surfaced as its own pair of buttons so it's
+ * immediately visible which ones the selected model actually accepts. */
+const MODALITIES = [
+  { modality: "image", label: "Image", icon: "🖼️", dataTypes: new Set(["image", "images", "frames"]), accept: "image/*" },
+  { modality: "video", label: "Video", icon: "🎬", dataTypes: new Set(["video"]), accept: "video/*" },
+  { modality: "audio", label: "Audio", icon: "🎵", dataTypes: new Set(["audio"]), accept: "audio/*" },
+] as const;
 
 /**
  * Lets the user attach existing assets/references/characters (or upload a
@@ -37,12 +43,12 @@ export function AttachmentsPicker({
   attachments: Attachment[];
   onChange: (next: Attachment[]) => void;
 }) {
-  const [openPicker, setOpenPicker] = useState<PickerKind | null>(null);
+  const [openPicker, setOpenPicker] = useState<{ kind: PickerKind; dataTypes: string[] } | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const hasMediaType = dataTypes.some((t) => MEDIA_DATA_TYPES.has(t));
+  const activeModalities = MODALITIES.filter((m) => dataTypes.some((t) => m.dataTypes.has(t)));
   const hasReference = dataTypes.includes("reference");
   const hasCharacter = dataTypes.includes("character");
 
@@ -117,32 +123,36 @@ export function AttachmentsPicker({
         ))}
       </div>
 
-      <div className="flex flex-wrap gap-1.5">
-        {hasMediaType && (
+      {activeModalities.map(({ modality, label, icon, accept }) => (
+        <div key={modality} className="flex flex-wrap items-center gap-1.5">
+          <span className="text-xs text-ink/40">{icon} {label}:</span>
           <DropZone onFiles={handleUpload} disabled={uploading} className="inline-block">
             <button
               type="button"
               disabled={uploading}
-              onClick={() => fileInputRef.current?.click()}
+              onClick={() => {
+                if (fileInputRef.current) fileInputRef.current.accept = accept;
+                fileInputRef.current?.click();
+              }}
               className="rounded-none border border-dashed border-ink/25 px-2.5 py-1.5 text-xs text-ink/60 hover:border-ink/40 hover:text-ink/90 disabled:opacity-50"
             >
               {uploading ? "Uploading…" : "+ Upload (or drop)"}
             </button>
           </DropZone>
-        )}
-        {hasMediaType && (
           <button
             type="button"
-            onClick={() => setOpenPicker("asset")}
+            onClick={() => setOpenPicker({ kind: "asset", dataTypes: [modality] })}
             className="rounded-none border border-dashed border-ink/25 px-2.5 py-1.5 text-xs text-ink/60 hover:border-ink/40 hover:text-ink/90"
           >
-            + Assets
+            + Browse {label.toLowerCase()} assets
           </button>
-        )}
+        </div>
+      ))}
+      <div className="flex flex-wrap gap-1.5">
         {hasReference && (
           <button
             type="button"
-            onClick={() => setOpenPicker("reference")}
+            onClick={() => setOpenPicker({ kind: "reference", dataTypes })}
             className="rounded-none border border-dashed border-ink/25 px-2.5 py-1.5 text-xs text-ink/60 hover:border-ink/40 hover:text-ink/90"
           >
             + References
@@ -151,7 +161,7 @@ export function AttachmentsPicker({
         {hasCharacter && (
           <button
             type="button"
-            onClick={() => setOpenPicker("character")}
+            onClick={() => setOpenPicker({ kind: "character", dataTypes })}
             className="rounded-none border border-dashed border-ink/25 px-2.5 py-1.5 text-xs text-ink/60 hover:border-ink/40 hover:text-ink/90"
           >
             + Characters
@@ -164,8 +174,8 @@ export function AttachmentsPicker({
 
       {openPicker && (
         <AttachmentPickerModal
-          kind={openPicker}
-          dataTypes={dataTypes}
+          kind={openPicker.kind}
+          dataTypes={openPicker.dataTypes}
           onPick={(item) => add({ assetId: item.assetId, url: item.previewUrl!, mimeType: item.mimeType ?? "", type: item.type, title: item.title })}
           onClose={() => setOpenPicker(null)}
         />

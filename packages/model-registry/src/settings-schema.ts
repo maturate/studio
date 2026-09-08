@@ -35,6 +35,82 @@ const GEMINI_TTS_VOICES = [
   "Vindemiatrix", "Sadachbia", "Sadaltager", "Sulafat",
 ];
 
+/**
+ * Shared by both Gemini Omni models (same Interactions API, same
+ * generation_config/response_format schema). Fields grounded in Google's
+ * own SDK type definitions (video_config.task, response_format for video,
+ * thinking_level, seed) — confirmed live for gemini-omni-1.1-flash-preview;
+ * "auto"/0 sentinels below mean "don't send this field" so the model falls
+ * back to its own default behavior.
+ */
+const OMNI_SETTINGS: SettingField[] = [
+  {
+    key: "task",
+    label: "Task",
+    type: "select",
+    options: [
+      { value: "auto", label: "Auto (let the model infer from prompt/inputs)" },
+      { value: "text_to_video", label: "Text to video" },
+      { value: "image_to_video", label: "Image to video" },
+      { value: "reference_to_video", label: "Reference to video" },
+      { value: "edit", label: "Edit (existing video input)" },
+      { value: "extend", label: "Extend (existing video input)" },
+    ],
+    default: "auto",
+  },
+  {
+    key: "aspectRatio",
+    label: "Aspect ratio",
+    type: "select",
+    options: [
+      { value: "16:9", label: "16:9" },
+      { value: "9:16", label: "9:16" },
+    ],
+    default: "16:9",
+  },
+  {
+    key: "resolution",
+    label: "Resolution",
+    type: "select",
+    options: [
+      { value: "360p", label: "360p" },
+      { value: "720p", label: "720p" },
+      { value: "1080p", label: "1080p" },
+      { value: "4k", label: "4K" },
+    ],
+    default: "720p",
+  },
+  {
+    key: "durationSeconds",
+    label: "Duration (seconds)",
+    type: "number",
+    min: 2,
+    max: 30,
+    default: 8,
+    hint: "Sent as a duration hint — Google hasn't published the exact accepted range for this preview model.",
+  },
+  {
+    key: "thinkingLevel",
+    label: "Thinking level",
+    type: "select",
+    options: [
+      { value: "low", label: "Low" },
+      { value: "high", label: "High" },
+    ],
+    default: "low",
+    hint: "How much internal reasoning the model does before generating. \"medium\"/\"minimal\" exist in Google's general schema but this model rejects them (\"not a supported thinking level for this model\", confirmed live) — only low/high work here.",
+  },
+  {
+    key: "seed",
+    label: "Seed",
+    type: "number",
+    min: 0,
+    max: 2147483647,
+    default: 0,
+    hint: "0 = random/no fixed seed. Set a fixed value for reproducible output.",
+  },
+];
+
 export const SETTINGS_SCHEMA: Record<string, SettingField[]> = {
   "gemini-3.1-flash-tts-preview": [
     {
@@ -219,6 +295,8 @@ export const SETTINGS_SCHEMA: Record<string, SettingField[]> = {
     },
     { key: "duration", label: "Duration (seconds)", type: "number", min: 3, max: 15, default: 5 },
   ],
+  "gemini-omni-flash-preview": OMNI_SETTINGS,
+  "gemini-omni-1.1-flash-preview": OMNI_SETTINGS,
   "seedream-5.0-pro": [
     {
       key: "size",

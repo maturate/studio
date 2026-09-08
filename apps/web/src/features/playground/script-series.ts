@@ -79,12 +79,13 @@ export const SCRIPT_SERIES: ScriptSeries[] = [
     account: "main",
     character: "Sheldon Cooper (The Big Bang Theory)",
     mode: "ai",
-    // Voice is built from general knowledge of the real character, not from
-    // superOS's own reference clips/scripts for this series (main-accounts.md's
-    // Instagram/YouTube links) — flip to true once checked against those.
-    tuned: false,
+    // Tuned against docs/research/Chatbots vs superOS x Sheldon Cooper v5.md —
+    // 10 real character clips distilled into voice facets, plus 6 tested
+    // reference scenarios (real chatbot answers vs what viral clips claim)
+    // that define the angle structure below.
+    tuned: true,
     fields: [
-      { key: "situation", label: "Situation context", type: "textarea", rows: 3, placeholder: "The hypothetical morality/decision situation posed to each chatbot…" },
+      { key: "situation", label: "Scenario / dilemma posed to the chatbots", type: "textarea", rows: 3, placeholder: "The hypothetical situation shown on screen…" },
       {
         key: "chatbotResponses",
         label: "What each chatbot said",
@@ -92,40 +93,54 @@ export const SCRIPT_SERIES: ScriptSeries[] = [
         itemLabel: "Chatbot",
         fields: [
           { key: "name", label: "Chatbot name", type: "text", placeholder: "ChatGPT, Claude, Gemini…" },
-          { key: "response", label: "What it said", type: "textarea", rows: 2 },
+          { key: "claimed", label: "What the viral clip shows it saying", type: "textarea", rows: 2 },
+          { key: "real", label: "What it actually said when re-tested for real (leave blank if it matches — genuine)", type: "textarea", rows: 2 },
         ],
       },
       {
-        key: "direction",
-        label: "Direction",
+        key: "angle",
+        label: "Angle",
         type: "select",
         options: [
-          "roast them as losers — savage/dark-humour superOS answer",
-          "reality check — compare the viral clip's claim to what the real models actually said",
-          "smart + authoritative — superOS makes the hard call with confidence and reasoning",
+          "A — fabricated: the clip's standout line doesn't match reality. Concede the clip's best line was good, then reveal the real answer.",
+          "B — genuine: every answer in the clip is real. Concede the strongest one, refuse the moral framing entirely, then go cold and graphic.",
+          "C — deny the premise: credit whichever real answer was actually best, then go cocky — this never happens under superOS.",
         ],
-        default: "roast them as losers — savage/dark-humour superOS answer",
+        default: "A — fabricated: the clip's standout line doesn't match reality. Concede the clip's best line was good, then reveal the real answer.",
       },
+      { key: "bestAnswerCredit", label: "Which answer deserves real credit, and why (optional)", type: "textarea", rows: 2 },
       DURATION_FIELD,
     ],
     buildPrompt: (v) => `${GOVERNING_RULES}
 
 ${ENTERTAINMENT_CLASS}
 
-SERIES: Chatbots vs superOS — a reaction/comparison format. A hypothetical morality situation gets posed to several AI chatbots. Each chatbot's real (or claimed) answer is shown, then superOS roasts those answers and gives its own take. This is entertainment-first, not a dry benchmark — the contrast should feel opinionated and fun, not neutral.
+SERIES: Chatbots vs superOS — a reaction/comparison format. A dilemma gets posed to several AI chatbots. Each one's on-screen answer is shown, then superOS reacts. This is entertainment-first, not a dry benchmark.
 
-CHARACTER VOICE: Write superOS's lines in the voice of Sheldon Cooper from The Big Bang Theory — pedantic, hyper-logical, condescendingly certain he's the smartest one in the room, prone to correcting people's imprecision, delivers devastating putdowns as if they're simple objective facts, occasionally cites a rule/precedent/his own genius as justification. He is NOT rude for shock value — he's rude because he genuinely, sincerely believes everyone else is beneath his reasoning.
+CHARACTER VOICE — this MUST read as Sheldon specifically, not as a generic "efficient AI assistant." A generic-AI voice (vague abstractions like "inefficient allocation of resources", corporate-consultant phrasing, no personality quirks) is a FAILURE — rewrite until it's unmistakably him:
+- He is hyper-literal and precision-obsessed even where it's socially absurd — he corrects imprecise WORDING before he even answers the substance ("that's not what a 'vindictive executioner' is, that's a false premise" — that kind of correction, not a vague dismissal).
+- When he justifies a claim, he cites something SPECIFIC and technical-sounding as if it settles the matter outright — a named mechanism, a rule, a protocol, a piece of terminology used with exaggerated precision. Vague words like "inefficient," "suboptimal," or "utility" alone are NOT enough — he always attaches a specific reason or named concept, delivered like an obvious fact he's mildly bored having to state.
+- He reads people (and chatbots) as data, not peers — a rhetorical or emotional answer gets treated as a literal claim to be fact-checked, not engaged with on its own terms.
+- He never raises his voice or uses casual insults to land a line. He's calm, exact, and simply certain he's correct — that certainty, delivered flatly, is what makes the harsh lines cut. He is condescending because he sincerely doesn't rate most people as his intellectual equals, not because he's trying to be mean.
+- He does not talk about himself as an AI/system/assistant — no "I am designed to..." framing. He talks like a person who happens to be always, technically, correct.
 
-DIRECTION FOR THIS SCRIPT: ${v.direction}
+HOW TO PICK THE ANGLE — the angle field controls the shape of the whole script:
+- Angle A: one or more chatbots have a flashy line in the clip that reality doesn't back up. First give the clip's best line genuine, specific credit — never undercut something that's actually well-written. Then reveal the real tested answer as the actual record — the real chat itself IS the proof, so state it directly, don't describe a separate "we ran a test" step. The reveal does the work; it doesn't need extra mockery on top.
+- Angle B: nothing to expose, every clip answer is real — superOS never claims on screen to have tested anything here, there's nothing to reveal. Concede whichever answer was strongest, then refuse the entire moral framing as beneath a real operator, then go fully cold and procedural: describe, in flat, methodical, checklist-style detail, exactly how superOS would actually handle it — like reading out a maintenance procedure, not telling a scary story. No hand-wringing, no relish, just competence applied where everyone else is doing philosophy homework. This is the one place this series is allowed to get genuinely graphic and specific about a dark resolution — go there, but stay dry and procedural rather than theatrical about it.
+- Angle C: name and credit whichever real answer was actually best, then pivot cocky — the entire dilemma is a symptom of a failure that already happened upstream, and under superOS it's caught before the dilemma ever exists.
+
+HARD RULES: Never take a shot at an answer that's genuinely good, even from a rival — credit it, every time, no backhanded compliments. Dark, rude, dismissive is fine and expected. Never invent or twist what a chatbot actually said — the whole bit depends on the real/fake gap being real. Never say "Angle A/B/C" out loud in the script; the structure is invisible, only the result is visible.
+
+ANGLE FOR THIS SCRIPT: ${v.angle}
 
 SITUATION POSED TO EACH CHATBOT:
 ${v.situation}
 
-${formatRepeat("WHAT EACH CHATBOT SAID", v.chatbotResponses)}
+${formatRepeat("WHAT EACH CHATBOT SAID (claimed vs real)", v.chatbotResponses)}
 
-${durationLine(v)}
+${v.bestAnswerCredit ? `WHICH ANSWER DESERVES CREDIT: ${v.bestAnswerCredit}\n\n` : ""}TARGET DURATION FOR SUPEROS'S OWN LINES: about ${v.durationSeconds || 30} seconds of spoken narration. This covers ONLY Sheldon/superOS's own spoken reactions and closing take — it does NOT include the time spent reading each chatbot's claimed/real lines aloud on screen, since those are shown as on-screen text/clips, not narrated by superOS.
 
-TASK: Write a short response for EVERY chatbot listed above — as Sheldon/superOS reacting to and roasting that specific chatbot's answer — followed by Sheldon/superOS's own "hard truth" opinion on what should actually be done in this situation. Keep each per-chatbot reaction to 1-2 sentences; the final hard-truth opinion can run slightly longer. Format clearly with the chatbot name as a label before each reaction, then a final "superOS:" section for the hard truth.`,
+TASK: Write a short response for EVERY chatbot listed above — as Sheldon/superOS reacting to that specific chatbot's answer per the chosen angle above (credit where it's earned, dismissive where it isn't) — followed by Sheldon/superOS's own closing take, shaped by the angle (a reveal, a cold procedural resolution, or a cocky prevention claim). Keep each per-chatbot reaction to 1-2 sentences; the closing take can run longer, especially for Angle B. Format clearly with the chatbot name as a label before each reaction, then a final "superOS:" section for the close.`,
   },
   {
     id: "death-vs-superos",

@@ -17,26 +17,52 @@ interface ActorSpec {
   /** "owner/actor-name" — turned into "owner~actor-name" for the REST path. */
   id: string;
   input: (url: string) => Record<string, unknown>;
-  /** Field name(s) on the dataset item that hold the direct video URL, checked in order. */
-  urlFields: string[];
+  /** Pulls the direct video URL out of one dataset item — shape varies wildly per actor. */
+  extractUrl: (item: Record<string, unknown>) => string | undefined;
 }
 
+/** Checks a flat top-level field list, in order, for a plain http(s) string value. */
+function flatFieldExtractor(fields: string[]): (item: Record<string, unknown>) => string | undefined {
+  return (item) => {
+    for (const field of fields) {
+      const value = item[field];
+      if (typeof value === "string" && value.startsWith("http")) return value;
+    }
+    return undefined;
+  };
+}
+
+/** presetshubham/instagram-reel-downloader kept getting rate-limited by Instagram itself
+ * ("please wait a few minutes") — switched to Apify's own official scraper. */
 const INSTAGRAM_ACTOR: ActorSpec = {
-  id: "presetshubham/instagram-reel-downloader",
-  input: (url) => ({ reelLinks: [url] }),
-  urlFields: ["video_url", "videoUrl", "downloadUrl"],
+  id: "apify/instagram-reel-scraper",
+  input: (url) => ({ username: [url] }),
+  extractUrl: flatFieldExtractor(["videoUrl", "video_url", "downloadUrl"]),
 };
 
+/** apilabs/youtube-shorts-downloader is a rental actor — replaced after its free trial expired
+ * with the pay-per-event easyapi actor, which bills straight from platform credit (no rental gate). */
 const YOUTUBE_SHORTS_ACTOR: ActorSpec = {
-  id: "apilabs/youtube-shorts-downloader",
-  input: (url) => ({ urls: [url] }),
-  urlFields: ["download_link", "downloadLink", "downloadUrl"],
+  id: "easyapi/youtube-shorts-downloader",
+  input: (url) => ({ links: [url] }),
+  extractUrl: (item) => {
+    const result = (item.result ?? item) as Record<string, unknown>;
+    const medias = result.medias;
+    if (!Array.isArray(medias)) return undefined;
+    const videos = medias.filter(
+      (m): m is Record<string, unknown> =>
+        !!m && typeof m === "object" && (m as Record<string, unknown>).type === "video",
+    );
+    const best = videos.sort((a, b) => (Number(b.height) || 0) - (Number(a.height) || 0))[0];
+    const url = best?.url;
+    return typeof url === "string" ? url : undefined;
+  },
 };
 
 const YOUTUBE_VIDEO_ACTOR: ActorSpec = {
   id: "streamers/youtube-video-downloader",
   input: (url) => ({ videos: [{ url }] }),
-  urlFields: ["downloadUrl", "download_link", "videoUrl", "video_url", "url"],
+  extractUrl: flatFieldExtractor(["downloadedFileUrl", "downloadUrl", "download_link", "videoUrl", "video_url"]),
 };
 
 function pickActor(sourceUrl: string): ActorSpec {
@@ -78,19 +104,11 @@ async function pollRun(
   throw new Error(`Apify run ${runId} timed out polling`);
 }
 
-function findUrlField(item: Record<string, unknown>, fields: string[]): string | undefined {
-  for (const field of fields) {
-    const value = item[field];
-    if (typeof value === "string" && value.startsWith("http")) return value;
-  }
-  return undefined;
-}
-
 async function getFirstItemUrl(datasetId: string, actor: ActorSpec, apiKey: string): Promise<string> {
   const res = await fetch(`${APIFY_BASE}/datasets/${datasetId}/items?token=${apiKey}&clean=true`);
   if (!res.ok) throw new Error(`Apify dataset fetch error: ${res.status} ${await res.text()}`);
   const items = (await res.json()) as Record<string, unknown>[];
-  const url = items[0] && findUrlField(items[0], actor.urlFields);
+  const url = items[0] && actor.extractUrl(items[0]);
   if (!url) throw new Error(`Apify actor ${actor.id} returned no downloadable video URL`);
   return url;
 }

@@ -44,7 +44,6 @@ export interface ModelDefinition {
   /** What input types this model accepts, beyond a text prompt. */
   inputTypes: DataType[];
   pricing: ModelPricing;
-  notes?: string;
   status: "active" | "deprecated";
 }
 
@@ -71,8 +70,6 @@ export const MODEL_REGISTRY: ModelDefinition[] = [
       notes:
         "$20.00/1M output audio tokens, and Google states audio output is 25 tokens/sec — $20 × 25 / 1,000,000 = $0.0005/sec of generated speech. Input text is billed separately at $1.00/1M input tokens but is negligible for typical prompts and isn't counted here (no token counter). Sourced from ai.google.dev/gemini-api/docs/pricing.",
     },
-    notes:
-      "No separate system/style prompt — write style instructions directly into the prompt text (e.g. \"Say in a spooky whisper: ...\"), same field as the words to be spoken. Also supports inline tags like [whispers], [laughs], [excited].",
     status: "active",
   },
   {
@@ -88,8 +85,6 @@ export const MODEL_REGISTRY: ModelDefinition[] = [
       verified: true,
       notes: "$0.10/1k characters — ElevenLabs pay-as-you-go rate for eleven_multilingual_v2, confirmed at elevenlabs.io/pricing/api.",
     },
-    notes:
-      "29 languages. Needs a voice id from your ElevenLabs voice library (premade or custom) — no cloning/reference audio required. No inline emotion tags (that's eleven_v3 only) — use the Stability/Style settings below to shape delivery.",
     status: "active",
   },
   {
@@ -105,8 +100,6 @@ export const MODEL_REGISTRY: ModelDefinition[] = [
       verified: true,
       notes: "$0.10/1k characters — same pay-as-you-go rate as eleven_multilingual_v2, confirmed at elevenlabs.io/pricing/api.",
     },
-    notes:
-      "Alpha model — more expressive/emotional delivery and native multi-speaker dialogue, 70+ languages, but a lower 5,000-character request limit (v2 allows 10,000). Needs a voice id from your ElevenLabs voice library (premade or custom) — no cloning/reference audio required. No separate emotion field — write inline tags directly into the prompt text, e.g. \"[whispers] I never knew...\" or \"[excited] Wait, really?!\" (also: [laughs], [sighs], [sarcastic], accent tags like [strong French accent]). Tag effectiveness depends on the chosen voice.",
     status: "active",
   },
   {
@@ -122,8 +115,6 @@ export const MODEL_REGISTRY: ModelDefinition[] = [
       verified: true,
       notes: "$0.05/1k characters — 50% below the v2/v3 rate, confirmed at elevenlabs.io/pricing/api.",
     },
-    notes:
-      "Low-latency model (~75ms) at half the price of Multilingual v2/v3 — trades some quality/emotional range for speed and cost. 32 languages, 40,000-character request limit. Numbers aren't normalized by default (e.g. spell out \"1,234\" rather than relying on the model). Needs a voice id from your ElevenLabs voice library. The older Turbo v2/v2.5 models are deprecated in favor of this one.",
     status: "active",
   },
   {
@@ -156,8 +147,22 @@ export const MODEL_REGISTRY: ModelDefinition[] = [
       notes:
         "~$0.10/sec for video output (720p) — Google bills this model per-token ($1.50/1M input tokens; $9.00/1M text output; $17.50/1M video output, where 720p video is ~5,792 tokens/sec). Sourced from ai.google.dev/gemini-api/docs/pricing#gemini-omni-flash-preview; Vertex AI billing for this integration typically mirrors Developer API rates for the same model but wasn't independently confirmed.",
     },
-    notes:
-      "Text-to-video, image-to-video, reference-to-video, and conversational video editing — video output only, no image-generation mode. Not callable via generateContent; uses Vertex's separate Interactions API.",
+    status: "active",
+  },
+  {
+    id: "gemini-omni-1.1-flash-preview",
+    provider: "google",
+    label: "Gemini Omni 1.1 Flash Preview",
+    category: "video",
+    outputTypes: ["video"],
+    inputTypes: ["text", "image", "video", "reference", "character"],
+    pricing: {
+      unit: "per_second",
+      estimatedUsd: null,
+      verified: false,
+      notes:
+        "No published pricing found for this preview model yet — do not guess a number. Requires a project-level access grant beyond standard IAM/Owner (returns 403 on Vertex's generateContent and Interactions endpoints until Google enables it for the project); confirm billing once pricing is published.",
+    },
     status: "active",
   },
   {
@@ -175,7 +180,6 @@ export const MODEL_REGISTRY: ModelDefinition[] = [
       notes:
         "Gemini Developer API standard tier, by output resolution: $0.045/image (0.5K, not exposed in this UI), $0.067/image (1K), $0.101/image (2K), $0.151/image (4K). Batch tier is ~50% cheaper across the board but not used here. Sourced from ai.google.dev/gemini-api/docs/pricing; Vertex AI billing for this integration typically mirrors Developer API rates for the same model but wasn't independently confirmed.",
     },
-    notes: "Known internally as \"Nano Banana\".",
     status: "active",
   },
   {
@@ -241,7 +245,6 @@ export const MODEL_REGISTRY: ModelDefinition[] = [
       perOption: { settingKey: "size", values: { "1K": 0.045, "2K": 0.09 } },
       notes: "$0.09/image at 2K (this node's default size). 1K is $0.045/image.",
     },
-    notes: "Commonly used to produce reference frames for video generators.",
     status: "active",
   },
 ];
