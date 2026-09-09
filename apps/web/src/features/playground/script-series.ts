@@ -45,6 +45,30 @@ const ENTERTAINMENT_CLASS = `This is an ENTERTAINMENT-CLASS script (per superOS'
 const UTILITY_CLASS = `This is a UTILITY-CLASS script (per superOS's content rules). superOS must never come across as a negative character — it should feel dependable, capable, authoritative, and helpful throughout.`;
 
 /**
+ * Adapted from the LinkedIn humaniser prompt the team already uses, but
+ * deliberately narrowed: that prompt tells you to write casually and avoid
+ * jargon, which would destroy a character like Sheldon whose whole voice is
+ * formal and technical. So this keeps only the STRUCTURAL tells (rhythm,
+ * rhetorical shape) and explicitly protects register.
+ */
+const ANTI_AI_TELLS = `SOUND WRITTEN, NOT GENERATED. The biggest giveaway in scripts like these isn't vocabulary, it's rhythm: sentences arranged too neatly, every point landing as a balanced little aphorism. This section is about STRUCTURE only. Do not sand off the character's voice, precision, or technical vocabulary to satisfy it.
+
+Kill these patterns:
+- The rhetorical flip: "That's not a dilemma. That's a perimeter that failed an hour earlier." / "It isn't X. It's Y." / "You don't need X. You need Y." It's genuinely strong once. In every single script it becomes a signature, and a signature that reads as machine-written. AT MOST ONE per script, and only where it's truly the sharpest way to say the thing. Otherwise just say the second half and move on.
+- Decorative three-part lists: "No jammed rifle, no tiger, no dilemma." A list of three is fine when the three items are real and each does separate work. It's a tell when it's there for the cadence.
+- Fragments used as drama. "Correct." as a flat reaction is in character and fine. "Efficiency. Precision. Results." is not.
+- Inflating a small observation into a general law. Say the specific thing that actually happened, not the principle it supposedly demonstrates.
+- Paragraphs of suspiciously even length that each end on a punchline. Let some sentences just carry information and stop.
+- Em dashes. Use a comma, a full stop, or a colon.
+
+Keep these. They are NOT the problem:
+- Formal register, long words, technical terms, precise jargon, pedantry, over-explanation. If the character talks that way, that IS the voice, and stripping it is the bigger failure.
+- Strong opinions, bluntness, rudeness, dark humour.
+- Sentences that simply explain something instead of landing a hook.
+
+Before you output, read it back and ask whether a real writer with this character's personality would have written that sentence, or whether it merely has the shape of something clever. If it's shape, rewrite it plainly.`;
+
+/**
  * Distilled from the 10 transcribed Big Bang Theory clips in Part A of
  * docs/research/"Chatbots vs superOS x Sheldon Cooper.md" — each behaviour
  * below traces to a specific scene, so the model gets concrete mechanics to
@@ -164,6 +188,8 @@ export const SCRIPT_SERIES: ScriptSeries[] = [
 
 ${ENTERTAINMENT_CLASS}
 
+${ANTI_AI_TELLS}
+
 SERIES: Chatbots vs superOS. A viral clip poses a dilemma to several AI chatbots and shows their answers. In our version that clip plays, superOS watches it alongside the viewer and interjects a word or two over each answer, and then — once the clip is done — superOS delivers one full closing verdict. That verdict is the payoff; everything before it is reaction.
 
 There are TWO voices, and they are not the same character:
@@ -264,6 +290,8 @@ TASK: Write the script following the output skeleton exactly. One interjection p
 
 ${ENTERTAINMENT_CLASS}
 
+${ANTI_AI_TELLS}
+
 SERIES: Death vs superOS — a survival reaction format. The viewer sees a life-or-death situation from their own POV, is asked what they'd do, then superOS tells them the best way to survive it. Not about literal realism — about entertainment, contrast, and memorability, with superOS as the calm operator in a high-stakes moment.
 
 CHARACTER VOICE: Write superOS's lines in the voice of Deadpool (Ryan Reynolds' performance) — fourth-wall-aware, sarcastic, breezily nonchalant even about horrific danger, quick pop-culture quips, treats mortal peril like a minor inconvenience he's mildly amused by. Confident, funny, a little unhinged — but the actual survival advice given must be genuinely the best option among those listed, not a joke answer.
@@ -292,6 +320,8 @@ TASK: Write a script, timed to roughly the target duration, where superOS (as De
     buildPrompt: (v) => `${GOVERNING_RULES}
 
 ${ENTERTAINMENT_CLASS}
+
+${ANTI_AI_TELLS}
 
 SERIES: AI Reacts — the loosest, most fun main-account series. superOS reacts to trending clips or internet moments in a sarcastic, entertaining way. The job is to roast what's happening while still landing a real take — not mean for no reason, but bolder and more unfiltered than a polite generic assistant. Disgust, shock, or blunt disbelief are all fair game if they land funny.
 
@@ -332,6 +362,8 @@ TASK: Write superOS's (as Ted) reaction script to this clip — roast it, riff o
 
 ${UTILITY_CLASS}
 
+${ANTI_AI_TELLS}
+
 SERIES: Tools You Should Know — "powerful websites you should know #" style format. Fast, useful, easy-to-scan. The creator talks to camera, a phone/tablet shows the flow. Only the website + WhatsApp surfaces should appear (never other interfaces) — the goal is to make superOS feel immediately practical, one use case at a time.
 
 VOICE: Fast, punchy AI UGC voiceover. Confident and useful, zero fluff, "here's a thing you should know" energy — never salesy.
@@ -367,6 +399,8 @@ TASK: Write one short voiceover line/beat per tool, each one clearly UNDER that 
     buildPrompt: (v) => `${GOVERNING_RULES}
 
 ${UTILITY_CLASS}
+
+${ANTI_AI_TELLS}
 
 SERIES: AI Hacks That Feel Illegal — same fast-explainer format family as Tools You Should Know, but framed as "when did ChatGPT/Claude/Gemini get this update?" — superOS is shown being accessed through MCP or an app-style integration INSIDE those other AI products, not through website + WhatsApp. Still grounded in real or credibly buildable product behavior — this is a stronger "this feels unfairly powerful" hook, not a fake claim.
 
@@ -412,6 +446,8 @@ TASK: Write one short voiceover line/beat per hack, each one clearly UNDER that 
 
 ${UTILITY_CLASS}
 
+${ANTI_AI_TELLS}
+
 SERIES: Character Podcast (sub-account) — a small fixed cast of recognizable parody characters having a podcast-style conversation about the product in this niche. Must sound like a REAL conversation, not marketing copy. Use caricature voices, not actor/voice clones.
 
 CHARACTER PERSONALITIES (use only the ones listed below for this script):
@@ -446,6 +482,8 @@ TASK: Write a short podcast-style dialogue between exactly the characters listed
     buildPrompt: (v) => `${GOVERNING_RULES}
 
 ${UTILITY_CLASS}
+
+${ANTI_AI_TELLS}
 
 SERIES: Text Conversations (sub-account) — conversation-style video with AI voiceovers, usually paired with sticky background footage (Subway Surfers, Minecraft, etc). Tone should be spicy, fast, and niche-relevant. Opens in a familiar chat app (iMessage/Discord-style), the problem shows up there, then moves into superOS (usually WhatsApp).
 
@@ -484,6 +522,8 @@ TASK: Write a sarcastic, dramatic text-conversation scene, building the problem 
 
 ${UTILITY_CLASS}
 
+${ANTI_AI_TELLS}
+
 SERIES: Free Tools / Every Tech Bro Ever Applying to YC (sub-account) — sarcastically serious, exaggerative send-up of an average Silicon Valley tech bro pitching their tool. Narrated by "Vibe."
 
 TOOL IDEA:
@@ -507,6 +547,8 @@ TASK: Write an exaggerated, self-important pitch script for this tool in classic
     buildPrompt: (v) => `${GOVERNING_RULES}
 
 ${UTILITY_CLASS}
+
+${ANTI_AI_TELLS}
 
 SERIES: AI Battles — pure split-screen head-to-head format, not UGC. The same task goes to superOS and to a competing tool (ChatGPT, Claude, Poke, Caddy, Vellum, etc). WWE-style commentary narrates the events. The video editor handles all visuals — this script only needs commentary dialogue and called-out sound-effect cues.
 
