@@ -130,6 +130,13 @@ export const SCRIPT_SERIES: ScriptSeries[] = [
           { key: "name", label: "Chatbot name", type: "text", placeholder: "ChatGPT, Claude, Gemini…" },
           { key: "claimed", label: "What the viral clip shows it saying (verbatim — this gets quoted in the script)", type: "textarea", rows: 2 },
           { key: "real", label: "What it actually said when re-tested for real (leave blank if it matches — genuine)", type: "textarea", rows: 2 },
+          {
+            key: "note",
+            label: "Handling note (optional)",
+            type: "textarea",
+            rows: 2,
+            placeholder: "e.g. \"not a target\" / \"this is the reveal, no pile-on\" / \"mild mention at most\" / \"best answer in the clip, concede\"",
+          },
         ],
       },
       {
@@ -192,6 +199,8 @@ BANNED REGISTER — if any of these show up, the verdict has failed and must be 
 
 HARD RULES (these hold across every angle):
 - Never roast an answer that's genuinely good, even a rival's. Credit it straight, no backhanded compliments, no fine print.
+- "Correct but boring" is NOT a target. Several models will give the same plain, sensible answer — that's them being right, not them being dull, and superOS does not score points off it. On a correct-but-plain answer the interjection is flat or neutral ("Correct." / "Mm." / "Yes, obviously."), never a quality judgement like "Uninspired." or "Weak." What IS fair game is a flaw in the REASONING even when the call itself is right — circular logic, an imprecise term, a wrong premise. Catching that is Sheldon doing what Sheldon does; sneering at a right answer for being short is just being a bad sport.
+- If a handling note is given for a chatbot below, follow it exactly — it overrides your own read of that answer. "Not a target" means no dig at all, not a gentle one.
 - Never invent or twist what a chatbot said. The whole format depends on the real/fake gap being real. If a real model already made the point superOS wants to make, superOS cannot claim it as its own — hand the credit over instead.
 - Never say "Angle A/B/C", "the reveal", or any structural term out loud. The structure is invisible; only the result is visible.
 - Sheldon cites specifics, but this is a real published video: do NOT invent a checkable fact — a named statute and section number, a case, a statistic, a study. If you don't know a real one, use a specific mechanism instead (thermal monitoring on the access road, a five-pin tumbler, a pressure plate). Precision about how a thing works is in character; a fabricated citation is a liability.
@@ -224,7 +233,7 @@ ANGLE FOR THIS SCRIPT: ${v.angle}
 SOURCE SETUP (quote this as the Narrator (source) line):
 ${v.situation}
 
-${formatRepeat("WHAT EACH CHATBOT SAID (claimed = what the clip shows, real = what it actually said when re-tested)", v.chatbotResponses)}
+${formatRepeat("WHAT EACH CHATBOT SAID (claimed = what the clip shows, real = what it actually said when re-tested, note = how to handle it — follow any note exactly)", v.chatbotResponses)}
 
 ${v.bestAnswerCredit ? `WHICH ANSWER DESERVES CREDIT: ${v.bestAnswerCredit}\n\n` : ""}${v.superOSSolution ? `WHAT SUPEROS WOULD ACTUALLY DO: ${v.superOSSolution}\n\n` : ""}TARGET DURATION: about ${v.durationSeconds || 30} seconds of superOS's OWN spoken lines — the interjections plus the closing verdict. It does NOT include the source clip's own playback (the narrator setup and the chatbot answers are quoted so the editor can cut to them, but they're not superOS talking). Since the interjections are only a word or two each, this budget is effectively the length of the closing verdict — pace it to actually fit.
 
