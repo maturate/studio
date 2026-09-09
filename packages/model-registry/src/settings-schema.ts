@@ -270,6 +270,52 @@ export const SETTINGS_SCHEMA: Record<string, SettingField[]> = {
     { key: "duration", label: "Duration (seconds)", type: "number", min: 4, max: 30, default: 5, hint: "4-30, or set to -1 for automatic." },
     { key: "generateAudio", label: "Generate audio", type: "boolean", default: true },
   ],
+  // Same surface as seedance-2.5; confirmed via AnyFast Seedance 2.5 docs (-nsfw suffix, same params).
+  "seedance-2.5-nsfw": [
+    {
+      key: "ratio",
+      label: "Aspect ratio",
+      type: "select",
+      options: ["21:9", "16:9", "4:3", "1:1", "3:4", "9:16", "adaptive"].map((v) => ({ value: v, label: v })),
+      default: "16:9",
+    },
+    {
+      key: "resolution",
+      label: "Resolution",
+      type: "select",
+      options: [
+        { value: "720p", label: "720p" },
+        { value: "1080p", label: "1080p" },
+      ],
+      default: "1080p",
+    },
+    { key: "duration", label: "Duration (seconds)", type: "number", min: 4, max: 30, default: 5, hint: "4-30, or set to -1 for automatic." },
+    { key: "generateAudio", label: "Generate audio", type: "boolean", default: true },
+  ],
+  // Seedance 2.0 params from AnyFast docs: duration 4–15, resolution includes 4k.
+  "seedance-2.0-nsfw": [
+    {
+      key: "ratio",
+      label: "Aspect ratio",
+      type: "select",
+      options: ["21:9", "16:9", "4:3", "1:1", "3:4", "9:16", "adaptive"].map((v) => ({ value: v, label: v })),
+      default: "16:9",
+    },
+    {
+      key: "resolution",
+      label: "Resolution",
+      type: "select",
+      options: [
+        { value: "480p", label: "480p" },
+        { value: "720p", label: "720p" },
+        { value: "1080p", label: "1080p" },
+        { value: "4k", label: "4K" },
+      ],
+      default: "720p",
+    },
+    { key: "duration", label: "Duration (seconds)", type: "number", min: 4, max: 15, default: 5, hint: "4-15 seconds." },
+    { key: "generateAudio", label: "Generate audio", type: "boolean", default: true },
+  ],
   "kuaishou/kling-video-3.0-omni": [
     {
       key: "mode",

@@ -82,19 +82,30 @@ async function downloadAsBuffer(url: string): Promise<{ data: Buffer; mimeType: 
   return { data: Buffer.from(await res.arrayBuffer()), mimeType: res.headers.get("content-type") };
 }
 
+const SEEDANCE_MODELS = new Set([
+  "seedance-2.5",
+  "seedance-2.5-nsfw",
+  "seedance-2.0-nsfw",
+]);
+
 export async function seedanceAdapter(input: GenerationInput): Promise<GenerationResult> {
   const apiKey = requireApiKey();
   if (!input.prompt) throw new Error("Seedance requires a text prompt");
+  if (!SEEDANCE_MODELS.has(input.modelId)) {
+    throw new Error(`Unsupported Seedance model id: ${input.modelId}`);
+  }
   const settings = input.settings ?? {};
+  // 2.0 defaults to 720p in AnyFast docs; 2.5 UI historically defaulted to 1080p.
+  const defaultResolution = input.modelId.startsWith("seedance-2.0") ? "720p" : "1080p";
 
   const startRes = await fetch(`${ANYFAST_BASE}/v1/video/generations`, {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "seedance-2.5",
+      model: input.modelId,
       content: [{ type: "text", text: input.prompt }],
       generate_audio: settings.generateAudio ?? true,
-      resolution: settings.resolution ?? "1080p",
+      resolution: settings.resolution ?? defaultResolution,
       ratio: settings.ratio ?? "16:9",
       duration: settings.duration ?? 5,
     }),

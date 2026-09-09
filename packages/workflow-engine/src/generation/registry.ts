@@ -13,6 +13,8 @@ const ADAPTERS: Record<string, GenerationAdapter> = {
   "gemini-omni-1.1-flash-preview": geminiOmni11FlashAdapter,
   "gemini-3.1-flash-image": geminiImageAdapter,
   "seedance-2.5": seedanceAdapter,
+  "seedance-2.5-nsfw": seedanceAdapter,
+  "seedance-2.0-nsfw": seedanceAdapter,
   "kuaishou/kling-video-3.0-omni": klingOmniAdapter,
   "seedream-5.0-pro": seedreamAdapter,
 };

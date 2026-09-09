@@ -215,6 +215,49 @@ export const MODEL_REGISTRY: ModelDefinition[] = [
     status: "active",
   },
   {
+    id: "seedance-2.5-nsfw",
+    provider: "bytedance",
+    label: "Seedance 2.5 NSFW",
+    category: "video",
+    outputTypes: ["video"],
+    inputTypes: ["text", "image", "frames"],
+    pricing: {
+      unit: "per_second",
+      estimatedUsd: null,
+      verified: false,
+      computeUsd: (input) => {
+        const settings = input.settings ?? {};
+        const resolution = settings.resolution === "1080p" ? "1080p" : "720p";
+        const rawDuration = Number(settings.duration);
+        const duration = rawDuration > 0 ? rawDuration : 5;
+        const [width, height] = resolution === "1080p" ? [1920, 1080] : [1280, 720];
+        const tokens = (height * width * duration * 24) / 1024;
+        // Same formula as seedance-2.5; NSFW Direct-group rates not independently confirmed.
+        const ratePerMillionUsd = resolution === "1080p" ? 11.7 : 10.7;
+        return (tokens / 1_000_000) * ratePerMillionUsd;
+      },
+      notes:
+        "Same Volcano Engine token formula as Seedance 2.5 (16:9 assumed). NSFW Direct-group pricing not independently confirmed — treat estimates as approximate. Live-verified: model id accepted by AnyFast (/v1/models + start returns insufficient_user_quota, not model_not_found).",
+    },
+    status: "active",
+  },
+  {
+    id: "seedance-2.0-nsfw",
+    provider: "bytedance",
+    label: "Seedance 2.0 NSFW",
+    category: "video",
+    outputTypes: ["video"],
+    inputTypes: ["text", "image", "frames"],
+    pricing: {
+      unit: "per_second",
+      estimatedUsd: null,
+      verified: false,
+      notes:
+        "AnyFast Direct-group NSFW variant of Seedance 2.0. Pricing not confirmed — leave estimate unset. Live-verified: POST /v1/video/generations returned 200 with task_id and task progressed to IN_PROGRESS.",
+    },
+    status: "active",
+  },
+  {
     id: "kuaishou/kling-video-3.0-omni",
     provider: "kuaishou",
     label: "Kling Video 3.0 Omni",

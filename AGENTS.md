@@ -148,7 +148,9 @@ The initial registry should be constrained to the production-approved tools and 
 - `Veo 3.1` (`veo-3.1-generate-preview`)
 - `Gemini Omni Flash Preview` (`gemini-omni-flash-preview`)
 - `Gemini 3.1 Flash Image` (`gemini-3.1-flash-image`)
-- `Seedance 2.5`
+- `Seedance 2.5` (`seedance-2.5`)
+- `Seedance 2.5 NSFW` (`seedance-2.5-nsfw`)
+- `Seedance 2.0 NSFW` (`seedance-2.0-nsfw`)
 - `Kling Video 3.0 Omni` (`kuaishou/kling-video-3.0-omni`)
 - `Seedream 5.0 Pro`
 
