@@ -13,11 +13,12 @@ import {
 import { getGenerationAdapter } from "./generation/registry";
 import { geminiGenerateText } from "./generation/providers/google";
 import {
+  collectReferences,
   resolvedValueToContextText,
-  resolvedValueToReference,
   resolvedValueToText,
   type ResolvedValue,
 } from "./resolve";
+import type { ReferenceInput } from "./generation/types";
 
 export interface NodeRunnerContext {
   runId: string;
@@ -47,7 +48,7 @@ async function resolveAssetValue(assetId: string): Promise<ResolvedValue> {
 async function generateOnce(
   modelId: string,
   prompt: string | undefined,
-  reference: ReturnType<typeof resolvedValueToReference>,
+  references: ReferenceInput[] | undefined,
   settings: Record<string, unknown> | undefined,
   ctx: NodeRunnerContext,
 ): Promise<{ assetIds: string[] }> {
@@ -58,7 +59,7 @@ async function generateOnce(
   const result = await adapter({
     modelId,
     prompt,
-    references: reference ? [reference] : undefined,
+    references: references && references.length > 0 ? references : undefined,
     settings,
   });
 
@@ -109,7 +110,7 @@ async function generateOnce(
 async function generateAndSaveAsset(
   modelId: string,
   prompt: string | undefined,
-  reference: ReturnType<typeof resolvedValueToReference>,
+  references: ReferenceInput[] | undefined,
   settingsWithCount: Record<string, unknown> | undefined,
   ctx: NodeRunnerContext,
 ): Promise<{ assetIds: string[]; failures: string[] }> {
@@ -120,7 +121,7 @@ async function generateAndSaveAsset(
   const failures: string[] = [];
   for (let i = 0; i < count; i++) {
     try {
-      const result = await generateOnce(modelId, prompt, reference, settings, ctx);
+      const result = await generateOnce(modelId, prompt, references, settings, ctx);
       assetIds.push(...result.assetIds);
     } catch (err) {
       failures.push(err instanceof Error ? err.message : String(err));
@@ -202,13 +203,13 @@ export async function executeNode(
       const contextText = resolvedValueToContextText(inputs.context);
       const basePrompt = resolvedValueToText(inputs.prompt) ?? (data.prompt as string | undefined) ?? "";
       const prompt = contextText ? `${contextText}\n\n---\n\n${basePrompt}` : basePrompt;
-      const reference = resolvedValueToReference(inputs.reference) ?? resolvedValueToReference(inputs.character);
+      const references = collectReferences(inputs);
       const outputPort = node.type === "image_generator" ? "image" : node.type === "audio_generator" ? "audio" : "video";
 
       const { assetIds, failures } = await generateAndSaveAsset(
         modelId,
         prompt,
-        reference,
+        references,
         data.settings as Record<string, unknown> | undefined,
         ctx,
       );

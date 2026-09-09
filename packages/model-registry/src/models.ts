@@ -188,7 +188,7 @@ export const MODEL_REGISTRY: ModelDefinition[] = [
     label: "Seedance 2.5",
     category: "video",
     outputTypes: ["video"],
-    inputTypes: ["text", "image", "frames"],
+    inputTypes: ["text", "image", "video", "audio", "frames", "reference", "character"],
     pricing: {
       unit: "per_second",
       estimatedUsd: null,
@@ -220,7 +220,7 @@ export const MODEL_REGISTRY: ModelDefinition[] = [
     label: "Seedance 2.5 NSFW",
     category: "video",
     outputTypes: ["video"],
-    inputTypes: ["text", "image", "frames"],
+    inputTypes: ["text", "image", "video", "audio", "frames", "reference", "character"],
     pricing: {
       unit: "per_second",
       estimatedUsd: null,
@@ -247,7 +247,7 @@ export const MODEL_REGISTRY: ModelDefinition[] = [
     label: "Seedance 2.0 NSFW",
     category: "video",
     outputTypes: ["video"],
-    inputTypes: ["text", "image", "frames"],
+    inputTypes: ["text", "image", "video", "audio", "frames", "reference", "character"],
     pricing: {
       unit: "per_second",
       estimatedUsd: null,
@@ -263,7 +263,7 @@ export const MODEL_REGISTRY: ModelDefinition[] = [
     label: "Kling Video 3.0 Omni",
     category: "video",
     outputTypes: ["video"],
-    inputTypes: ["text", "image", "reference", "character"],
+    inputTypes: ["text", "image", "video", "frames", "reference", "character"],
     pricing: {
       unit: "per_second",
       estimatedUsd: 0.112,
@@ -280,7 +280,7 @@ export const MODEL_REGISTRY: ModelDefinition[] = [
     label: "Seedream 5.0 Pro",
     category: "image",
     outputTypes: ["image"],
-    inputTypes: ["text", "image", "reference"],
+    inputTypes: ["text", "image", "reference", "character"],
     pricing: {
       unit: "per_generation",
       estimatedUsd: 0.09,

@@ -111,6 +111,98 @@ const OMNI_SETTINGS: SettingField[] = [
   },
 ];
 
+const SEEDANCE_IMAGE_MODE: SettingField = {
+  key: "imageMode",
+  label: "Image role",
+  type: "select",
+  options: [
+    { value: "reference", label: "Reference images (@imageN)" },
+    { value: "first_frame", label: "First frame" },
+    { value: "first_last_frame", label: "First + last frame" },
+  ],
+  default: "reference",
+  hint: "First/last-frame modes are mutually exclusive with multimodal reference images.",
+};
+
+const SEEDANCE_2_5_SETTINGS: SettingField[] = [
+  SEEDANCE_IMAGE_MODE,
+  {
+    key: "omniReferenceTaskType",
+    label: "Reference task",
+    type: "select",
+    options: [
+      { value: "auto", label: "Auto" },
+      { value: "reference", label: "Reference" },
+      { value: "edit", label: "Edit (needs video + adaptive/-1)" },
+      { value: "extend", label: "Extend (needs video + adaptive)" },
+    ],
+    default: "auto",
+  },
+  {
+    key: "ratio",
+    label: "Aspect ratio",
+    type: "select",
+    options: ["21:9", "16:9", "4:3", "1:1", "3:4", "9:16", "adaptive"].map((v) => ({ value: v, label: v })),
+    default: "16:9",
+  },
+  {
+    key: "resolution",
+    label: "Resolution",
+    type: "select",
+    options: [
+      { value: "480p", label: "480p" },
+      { value: "720p", label: "720p" },
+      { value: "1080p", label: "1080p" },
+    ],
+    default: "1080p",
+  },
+  { key: "duration", label: "Duration (seconds)", type: "number", min: -1, max: 30, default: 5, hint: "4–30, or -1 for automatic." },
+  {
+    key: "outputFormat",
+    label: "Container",
+    type: "select",
+    options: [
+      { value: "mp4", label: "MP4" },
+      { value: "mov", label: "MOV" },
+    ],
+    default: "mp4",
+  },
+  { key: "generateAudio", label: "Generate audio", type: "boolean", default: true },
+  { key: "webSearch", label: "Web search (text-to-video)", type: "boolean", default: false },
+  { key: "returnLastFrame", label: "Return last frame", type: "boolean", default: false },
+  { key: "watermark", label: "AI watermark", type: "boolean", default: false },
+  { key: "seed", label: "Seed (-1 = random)", type: "number", min: -1, max: 2147483647, default: -1 },
+];
+
+const SEEDANCE_2_0_SETTINGS: SettingField[] = [
+  SEEDANCE_IMAGE_MODE,
+  {
+    key: "ratio",
+    label: "Aspect ratio",
+    type: "select",
+    options: ["21:9", "16:9", "4:3", "1:1", "3:4", "9:16", "adaptive"].map((v) => ({ value: v, label: v })),
+    default: "16:9",
+  },
+  {
+    key: "resolution",
+    label: "Resolution",
+    type: "select",
+    options: [
+      { value: "480p", label: "480p" },
+      { value: "720p", label: "720p" },
+      { value: "1080p", label: "1080p" },
+      { value: "4k", label: "4K" },
+    ],
+    default: "720p",
+  },
+  { key: "duration", label: "Duration (seconds)", type: "number", min: 4, max: 15, default: 5, hint: "4–15 seconds." },
+  { key: "generateAudio", label: "Generate audio", type: "boolean", default: true },
+  { key: "webSearch", label: "Web search (text-to-video)", type: "boolean", default: false },
+  { key: "returnLastFrame", label: "Return last frame", type: "boolean", default: false },
+  { key: "watermark", label: "AI watermark", type: "boolean", default: false },
+  { key: "seed", label: "Seed (-1 = random)", type: "number", min: -1, max: 2147483647, default: -1 },
+];
+
 export const SETTINGS_SCHEMA: Record<string, SettingField[]> = {
   "gemini-3.1-flash-tts-preview": [
     {
@@ -249,74 +341,34 @@ export const SETTINGS_SCHEMA: Record<string, SettingField[]> = {
       default: "1K",
     },
   ],
-  "seedance-2.5": [
-    {
-      key: "ratio",
-      label: "Aspect ratio",
-      type: "select",
-      options: ["21:9", "16:9", "4:3", "1:1", "3:4", "9:16", "adaptive"].map((v) => ({ value: v, label: v })),
-      default: "16:9",
-    },
-    {
-      key: "resolution",
-      label: "Resolution",
-      type: "select",
-      options: [
-        { value: "720p", label: "720p" },
-        { value: "1080p", label: "1080p" },
-      ],
-      default: "1080p",
-    },
-    { key: "duration", label: "Duration (seconds)", type: "number", min: 4, max: 30, default: 5, hint: "4-30, or set to -1 for automatic." },
-    { key: "generateAudio", label: "Generate audio", type: "boolean", default: true },
-  ],
-  // Same surface as seedance-2.5; confirmed via AnyFast Seedance 2.5 docs (-nsfw suffix, same params).
-  "seedance-2.5-nsfw": [
-    {
-      key: "ratio",
-      label: "Aspect ratio",
-      type: "select",
-      options: ["21:9", "16:9", "4:3", "1:1", "3:4", "9:16", "adaptive"].map((v) => ({ value: v, label: v })),
-      default: "16:9",
-    },
-    {
-      key: "resolution",
-      label: "Resolution",
-      type: "select",
-      options: [
-        { value: "720p", label: "720p" },
-        { value: "1080p", label: "1080p" },
-      ],
-      default: "1080p",
-    },
-    { key: "duration", label: "Duration (seconds)", type: "number", min: 4, max: 30, default: 5, hint: "4-30, or set to -1 for automatic." },
-    { key: "generateAudio", label: "Generate audio", type: "boolean", default: true },
-  ],
-  // Seedance 2.0 params from AnyFast docs: duration 4–15, resolution includes 4k.
-  "seedance-2.0-nsfw": [
-    {
-      key: "ratio",
-      label: "Aspect ratio",
-      type: "select",
-      options: ["21:9", "16:9", "4:3", "1:1", "3:4", "9:16", "adaptive"].map((v) => ({ value: v, label: v })),
-      default: "16:9",
-    },
-    {
-      key: "resolution",
-      label: "Resolution",
-      type: "select",
-      options: [
-        { value: "480p", label: "480p" },
-        { value: "720p", label: "720p" },
-        { value: "1080p", label: "1080p" },
-        { value: "4k", label: "4K" },
-      ],
-      default: "720p",
-    },
-    { key: "duration", label: "Duration (seconds)", type: "number", min: 4, max: 15, default: 5, hint: "4-15 seconds." },
-    { key: "generateAudio", label: "Generate audio", type: "boolean", default: true },
-  ],
+  // AnyFast Seedance 2.5 (+ NSFW) — confirmed against docs.anyfast.ai Seedance 2.5 guide.
+  "seedance-2.5": SEEDANCE_2_5_SETTINGS,
+  "seedance-2.5-nsfw": SEEDANCE_2_5_SETTINGS,
+  // AnyFast Seedance 2.0 NSFW — duration 4–15, resolution up to 4k (no output_format / omni task type).
+  "seedance-2.0-nsfw": SEEDANCE_2_0_SETTINGS,
   "kuaishou/kling-video-3.0-omni": [
+    {
+      key: "imageMode",
+      label: "Image role",
+      type: "select",
+      options: [
+        { value: "reference", label: "Reference images (<<<image_n>>>)" },
+        { value: "first_frame", label: "First frame" },
+        { value: "first_last_frame", label: "First + end frame" },
+      ],
+      default: "reference",
+    },
+    {
+      key: "referType",
+      label: "Video reference type",
+      type: "select",
+      options: [
+        { value: "feature", label: "Feature (style/motion reference)" },
+        { value: "base", label: "Base (edit the input video)" },
+      ],
+      default: "feature",
+      hint: "Only used when a video attachment is present. Sound is forced off with video refs.",
+    },
     {
       key: "mode",
       label: "Mode",
@@ -340,6 +392,26 @@ export const SETTINGS_SCHEMA: Record<string, SettingField[]> = {
       default: "16:9",
     },
     { key: "duration", label: "Duration (seconds)", type: "number", min: 3, max: 15, default: 5 },
+    {
+      key: "sound",
+      label: "Generate sound",
+      type: "select",
+      options: [
+        { value: "off", label: "Off" },
+        { value: "on", label: "On" },
+      ],
+      default: "off",
+      hint: "Ignored (forced off) when a reference video is attached.",
+    },
+    { key: "keepOriginalSound", label: "Keep original video sound", type: "boolean", default: false },
+    {
+      key: "multiShot",
+      label: "Intelligent multi-shot",
+      type: "boolean",
+      default: false,
+      hint: "Uses Kling intelligence storyboard mode from the prompt (custom shot lists not exposed yet).",
+    },
+    { key: "watermark", label: "AI watermark", type: "boolean", default: false },
   ],
   "gemini-omni-flash-preview": OMNI_SETTINGS,
   "gemini-omni-1.1-flash-preview": OMNI_SETTINGS,
@@ -350,6 +422,7 @@ export const SETTINGS_SCHEMA: Record<string, SettingField[]> = {
       type: "select",
       options: [
         { value: "1K", label: "1K" },
+        { value: "1.5K", label: "1.5K" },
         { value: "2K", label: "2K" },
       ],
       default: "2K",
@@ -364,6 +437,34 @@ export const SETTINGS_SCHEMA: Record<string, SettingField[]> = {
       ],
       default: "png",
     },
+    {
+      key: "optimizePromptMode",
+      label: "Prompt optimize",
+      type: "select",
+      options: [
+        { value: "standard", label: "Standard (quality)" },
+        { value: "fast", label: "Fast (latency)" },
+      ],
+      default: "standard",
+    },
+    {
+      key: "background",
+      label: "Background",
+      type: "select",
+      options: [
+        { value: "opaque", label: "Opaque" },
+        { value: "transparent", label: "Transparent (single PNG ref)" },
+      ],
+      default: "opaque",
+    },
+    {
+      key: "layerDecomposition",
+      label: "Layer decomposition",
+      type: "boolean",
+      default: false,
+      hint: "Splits one reference image into a background + editable PNG layers.",
+    },
+    { key: "seed", label: "Seed (-1 = random)", type: "number", min: -1, max: 2147483647, default: -1 },
     { key: "watermark", label: "AI watermark", type: "boolean", default: false },
   ],
 };

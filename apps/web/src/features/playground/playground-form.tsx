@@ -408,8 +408,12 @@ export function PlaygroundForm({
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             rows={5}
-            required
-            placeholder="Describe what to generate…"
+            required={attachments.length === 0}
+            placeholder={
+              attachments.length > 0
+                ? "Optional when media is attached — describe the shot or leave blank…"
+                : "Describe what to generate…"
+            }
             className="w-full resize-none rounded-none border border-ink/10 bg-ink/5 px-3 py-2 text-sm text-ink placeholder:text-ink/35 focus:border-ink/25 focus:outline-none"
           />
         </div>
