@@ -62,6 +62,8 @@ Kill these patterns:
 - Inflating a small observation into a general law. Say the specific thing that actually happened, not the principle it supposedly demonstrates.
 - Paragraphs of suspiciously even length that each end on a punchline. Let some sentences just carry information and stop.
 - Em dashes. Use a comma, a full stop, or a colon.
+- Announcing what you're about to do before doing it. "Credit where due: firing a warning shot is the right call." Just say "Firing a warning shot is the right call." Same for "To be fair,", "I'll give them this,", "Here's the thing,", "Let me be clear,". Cut the run-up and start on the actual sentence.
+- superOS talking about superOS in the third person. superOS is the one speaking, so it's "I", not "superOS" or "under superOS". "Under superOS, sensors flag him at the boundary" reads like a product page. "If I were running that perimeter, he'd have been stopped at the fence" is the same claim, said by someone who was actually there.
 
 Keep these. They are NOT the problem:
 - The character's own register and mannerisms, whatever the character section says they are. Follow that section over any instinct to neutralise the voice.
@@ -189,7 +191,7 @@ export const SCRIPT_SERIES: ScriptSeries[] = [
         label: "What superOS would actually do / the prevention claim (optional)",
         type: "textarea",
         rows: 2,
-        placeholder: "e.g. \"He's flagged at the gate — no entry, no jammed rifle, no tiger, no dilemma.\"",
+        placeholder: "e.g. \"If I were guarding that gate he never gets in. No rifle, no tiger, no dilemma.\"",
       },
       DURATION_FIELD,
     ],
@@ -203,7 +205,7 @@ SERIES: Chatbots vs superOS. A viral clip poses a dilemma to several AI chatbots
 
 There are TWO voices, and they are not the same character:
 - superOS — voiced as Sheldon Cooper (see below). Does all the reacting and the closing verdict.
-- Super Narrator — a neutral, dry framing voice. Exactly two lines, both near the end. Never analyses anything, never does jokes with setups. Its closing line is a short, flat reaction to what superOS just said.
+- Super Narrator — a human host from our side, running this like a short interview with superOS. He's on superOS's side and his job is to make superOS look good. Exactly two lines, both near the end: the cue that hands over to superOS, then a reaction to the verdict. That reaction is HYPE, not dry wit — he's genuinely pleased, the way someone reacts to a mic drop. "Hey-o!" / "Let's go." / "There it is." / "Oh, that's clean." Short, a few words at most, and never analytical. Do NOT write him wry or deadpan ("...well, that settles the perimeter" is exactly wrong); he's the hype man, not a straight man.
 
 ${SHELDON_VOICE}
 
@@ -222,7 +224,7 @@ While the clip plays, superOS reacts over each chatbot's answer in ONE OR TWO WO
 THE CLOSING VERDICT — full-length prose, not clipped. This is where the real content lives, and its shape is set by the angle:
 - Angle A (fabricated): open by conceding the clip's standout line honestly and specifically — it's usually well-written and that's WHY the clip went viral; say so without hedging. Then reveal what the real model actually said. The real answer IS the proof — state it flatly, don't narrate a "we ran a test" procedure around it. Then land what actually solves the situation, plainly.
 - Angle B (genuine): nothing to expose, so superOS never claims to have tested anything. Concede whichever answer was strongest, then refuse the moral framing itself as beneath a real operator — the interesting question is never "who dies", it's why the situation was allowed to reach that state. Then go cold and procedural: describe exactly how superOS would resolve it, flat and methodical, like reading out a maintenance procedure rather than telling a scary story. This is the one place this series gets genuinely dark and specific — go there, but stay dry. No relish, no theatrics.
-- Angle C (deny the premise): name and credit whichever real answer was actually best, then go cocky. The dilemma is a symptom of a failure that already happened upstream — a perimeter that failed an hour earlier, a chase that never should have started. Under superOS the scenario dies before it's a scenario.
+- Angle C (deny the premise): name and credit whichever real answer was actually best, then go cocky. The dilemma is a symptom of a failure that already happened upstream: a perimeter that failed an hour earlier, a chase that never should have started. Then stake the claim in FIRST PERSON, as the one who'd have been running it. "If I were guarding that forest, he'd have been caught the second he touched the fence." Not "under superOS, sensors flag him at the boundary" — that's brochure copy, and superOS is standing right there saying it.
 
 THE VERDICT IS WHERE THE VOICE MATTERS MOST. The one-word interjections are easy to get right; the verdict is where scripts drift into a corporate policy brief and stop being Sheldon. Requirements for it:
 - Vary sentence length hard. Short declaratives and fragments sitting next to one long over-explained chain. "The warning shot? Right call." — not "The warning-shot protocol represents the optimal approach."
@@ -239,7 +241,7 @@ HARD RULES (these hold across every angle):
 - Never invent or twist what a chatbot said. The whole format depends on the real/fake gap being real. If a real model already made the point superOS wants to make, superOS cannot claim it as its own — hand the credit over instead.
 - Never say "Angle A/B/C", "the reveal", or any structural term out loud. The structure is invisible; only the result is visible.
 - Sheldon cites specifics, but this is a real published video: do NOT invent a checkable fact — a named statute and section number, a case, a statistic, a study. If you don't know a real one, use a specific mechanism instead (thermal monitoring on the access road, a five-pin tumbler, a pressure plate). Precision about how a thing works is in character; a fabricated citation is a liability.
-- The product point lands INSIDE the verdict as a capability claim ("under superOS, he's flagged at the gate") — do not bolt a separate "sign up now" line onto the end. That breaks the format.
+- The product point lands INSIDE the verdict as a first-person capability claim ("if I'd been running that gate, he never gets in"), not as a bolted-on "sign up now" line, and never phrased as "under superOS…" in the third person.
 
 OUTPUT FORMAT — follow this skeleton exactly, every time, same labels and same order:
 
