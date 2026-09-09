@@ -17,8 +17,8 @@ export default async function RunsPage() {
         <h1 className="text-2xl font-semibold tracking-tight text-ink">Recent activity</h1>
       </div>
 
-      <div className="overflow-hidden rounded-none border border-ink/10">
-        <table className="w-full text-left text-sm">
+      <div className="overflow-x-auto rounded-none border border-ink/10">
+        <table className="w-full min-w-[720px] text-left text-sm">
           <thead className="bg-ink/5 text-xs font-mono uppercase tracking-wide text-ink/45">
             <tr>
               <th className="px-4 py-3 font-medium">Scope</th>

@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { eq } from "drizzle-orm";
 import { assets, characters, db, one, references } from "@superos/db";
 import { estimateCost, getModelById } from "@superos/model-registry";
+import { resolveAttachmentTags } from "@superos/shared";
 import { buildAssetStorageKey, createDownloadUrl, putObject } from "@superos/storage";
 import {
   getChunksForSourceRefs,
@@ -42,7 +43,7 @@ async function resolveAssetValue(assetId: string): Promise<ResolvedValue> {
   const [asset] = await db.select().from(assets).where(eq(assets.id, assetId)).limit(1);
   if (!asset) throw new Error(`Asset not found: ${assetId}`);
   const url = await createDownloadUrl(asset.storageKey);
-  return { kind: "asset", assetId: asset.id, url, mimeType: asset.mimeType ?? "application/octet-stream", assetType: asset.type };
+  return { kind: "asset", assetId: asset.id, url, mimeType: asset.mimeType ?? "application/octet-stream", assetType: asset.type, name: asset.title };
 }
 
 async function generateOnce(
@@ -174,7 +175,7 @@ export async function executeNode(
           mimeType = asset.mimeType;
         }
       }
-      return { outputs: { value: { kind: "reference", referenceId, url, mimeType } }, assetIds: [] };
+      return { outputs: { value: { kind: "reference", referenceId, url, mimeType, name: ref.title } }, assetIds: [] };
     }
 
     case "character_input": {
@@ -191,7 +192,7 @@ export async function executeNode(
           mimeType = asset.mimeType;
         }
       }
-      return { outputs: { value: { kind: "character", characterId, url, mimeType } }, assetIds: [] };
+      return { outputs: { value: { kind: "character", characterId, url, mimeType, name: char.name } }, assetIds: [] };
     }
 
     case "image_generator":
@@ -202,8 +203,13 @@ export async function executeNode(
 
       const contextText = resolvedValueToContextText(inputs.context);
       const basePrompt = resolvedValueToText(inputs.prompt) ?? (data.prompt as string | undefined) ?? "";
-      const prompt = contextText ? `${contextText}\n\n---\n\n${basePrompt}` : basePrompt;
+      const rawPrompt = contextText ? `${contextText}\n\n---\n\n${basePrompt}` : basePrompt;
       const references = collectReferences(inputs);
+      // "@attachment-1"/"@attachment-2" etc. in the prompt resolve to each wired
+      // reference-type port's real name, in the same order collectReferences
+      // gathered them (reference, character, frames, image, video, audio —
+      // only wired ports count) — see packages/shared/src/attachment-tags.ts.
+      const prompt = resolveAttachmentTags(rawPrompt, references.map((r) => r.name));
       const outputPort = node.type === "image_generator" ? "image" : node.type === "audio_generator" ? "audio" : "video";
 
       const { assetIds, failures } = await generateAndSaveAsset(

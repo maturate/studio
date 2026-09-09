@@ -146,12 +146,12 @@ Person A \- Nah, bro, I'm a disruptor in the road safety industry.
 Person B \- I am calling multiple government agencies.   
 Person A \- Ask them if they wanna buy any traffic cones.
 
-superOS Direction-  
-"The Recharge That Never Happened" — Mobile Postpaid (Best Friends)  
-Context: Priyanka's postpaid bill keeps auto-adding a data pack she never asked for, and she's half-convinced Arjun's behind some prank on her account.  
-Character 1, Priyanka: blunt roaster, treats her phone bill like a personal vendetta.  
-Character 2, Arjun: denies everything, comedic overacting about being falsely accused.  
-How superOS saved the day: Priyanka sends the bill photo to superOS. It reads the itemized charges and sends the payment link, showing the add-on was just an auto-renewal, nothing to do with Arjun. She pays it, gets the receipt, and sets a reminder so it doesn't repeat. "Cool, wasn't you. superOS just saved our friendship."   
+**"The Bill That Slipped Through"** — Mobile Postpaid (Best Friends)  
+Context: Priyanka's postpaid bill is overdue and her service is about to get suspended for non-payment. She swears Arjun was supposed to remind her (like he always does) and blames him for "letting" it slip.  
+Priyanka: blunt roaster, treats the missed due date like Arjun personally sabotaged her.  
+Arjun: outraged denial, comedic overacting about being falsely accused of forgetting to nag her.  
+How superOS saved the day: Priyanka forwards the overdue-bill SMS to superOS. It reads the amount and due date, flags that service is about to be barred, and helps to pays the bill instantly via UPI before disconnection,  nothing Arjun could've stopped either, since the reminder never came from him in the first place. It gets the receipt and sets up an automatic due-date reminder so it never happens again.  
+"Cool, wasn't you. superOS's got my back now, not you."   
  
 
 3\.[https://www.instagram.com/reel/DDi8hyRKgtj/?utm\_source=ig\_web\_copy\_link\&igsh=MzRlODBiNWFlZA==\&igsi=MzRlODBiNWFlZA==](https://www.instagram.com/reel/DDi8hyRKgtj/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==&igsi=MzRlODBiNWFlZA==)
@@ -203,11 +203,15 @@ Person A \- Yippee\! Now I can buy a piece of gum at Dollar Tree.
 
 superOS direction \- 
 
-"Nobody Can Decide" (Roommates) — Food Delivery  
-Context: Both roommates are starving, both open five different apps, both keep sending "idk you decide" back and forth for twenty minutes without either actually deciding anything.  
-Character 1, Meher: genuinely too hungry to think straight, sends increasingly unhinged food suggestions ("cereal for dinner is valid"), spirals into fake despair.  
-Character 2, Kabir: equally indecisive but blames her for "always doing this," classic mutual-hunger-induced bickering.  
-How superOS saved the day: Meher finally just tells superOS what they're in the mood for (something quick, not too expensive), it checks a few options for price, ratings, and how fast it'll actually arrive, and comes back with one clear pick. She confirms, Kabir stops complaining the second it's ordered, and superOS pings them both when it's on the way. 
+**"Did I Really Eat That Badly"** **\-** Calorie Tracking
+
+**Context:** Sofia posts her dinner plate to her close friends story. Diego replies with a teasing comment and it spirals into both of them badly guessing how their day went.
+
+**Character 1, Sofia:** flash of guilt the second Diego comments, tries to do calorie math in her head and fails ("is a slice 300 or 900, I refuse to google it because then it's Real"), convinces herself she's ruined her whole week over one dinner.
+
+**Character 2, Diego:** teases her first, gets defensive the second she turns it back on him ,has zero idea what he ate either, just a vague memory of "chicken, rice, some brown sauce," insists he doesn't need macros he needs dinner.
+
+**How superOS saved the day:** Sofia photographs what's left on her plate mid-argument, gets a quick read back ,turns out it's fine, not the disaster she'd built up in her head. Diego, too lazy for a photo, just texts what he remembers eating and gets his own answer, equally unbothered by his guesswork. Sofia, still not convinced, checks her whole week instead of just the one meal ,turns out she's under, not over, and the argument deflates instantly. Diego goes quiet. Sofia declares it was "for content."
 
 4\. [https://www.instagram.com/reel/DDwyWgcNU3u/?utm\_source=ig\_web\_copy\_link\&igsh=MzRlODBiNWFlZA==\&igsi=MzRlODBiNWFlZA==](https://www.instagram.com/reel/DDwyWgcNU3u/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==&igsi=MzRlODBiNWFlZA==)
 
@@ -244,8 +248,13 @@ Person A \- Of course, sir. Check other videos for more of my deliveries. Kill h
 
 superOS Direction- 
 
-"The Diet Betrayal" (Best Friends) — Food Delivery  
-Context: One friend committed to "eating clean this week," the other keeps sending her tempting food pics, and it turns into a roast about willpower.  
-Character 1, Priyanka: performatively strong-willed, keeps insisting she's "not tempted" while very clearly is.  
-Character 2, Arjun: relentless, keeps sending "just one bite won't hurt" energy, enjoys watching her cave.  
-How superOS saved the day: Priyanka finally caves and tells superOS she wants something under a certain calorie count but still actually good. It compares a few places that fit and sends back the best match instead of her having to scroll through menus feeling guilty about every option. She confirms, orders it, and replies to Arjun: "handled. still under my limit though, don't @ me."   
+**"Cheat Day Court"** \- Calorie Tracking \=
+
+**Context:** Sofia and Lucas are "diet buddies" who agreed to keep each other accountable, which mostly means Lucas sends unsolicited food-shaming texts anytime Sofia posts anything remotely indulgent.
+
+**Character 1, Sofia:** posts a photo of fries at 11pm with zero shame, meets every accusation with maximum confidence and increasingly bad math ("fries are basically potatoes, potatoes are a vegetable, I'm thriving"), refuses to back down even when clearly losing.
+
+**Character 2, Lucas:** self-appointed diet accountability partner despite nobody asking, sends dramatic all-caps texts ("SOFIA. WE HAD A DEAL."), extremely confident in wildly overestimated calorie guesses, treats this like a personal betrayal.
+
+**How superOS saved the day:** Sofia, mid-argument, snaps a photo of the fries and fires the actual number straight into the chat ,comfortably lower than Lucas's dramatic guess, and she does not let him forget it. Lucas, refusing to lose entirely, brings up her lunch from earlier that day trying to catch her in a bigger crime; she checks that too and it's also fine, so now he's 0 for 2\. Cornered, Lucas finally admits he has no idea what he actually ate today either, gets called out on the spot, and quietly asks her to send the app "purely to keep tabs on you" ,which they both know is a lie.
+

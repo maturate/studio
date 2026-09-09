@@ -2,6 +2,10 @@ export interface ReferenceInput {
   /** Signed, fetchable URL for an image/audio reference asset. */
   url: string;
   mimeType: string;
+  /** Display name (asset title / reference title / character name) — used to
+   * resolve `@attachment-N` tags in the prompt to something the model can
+   * actually anchor to, via `resolveAttachmentTags` (packages/shared). */
+  name?: string;
 }
 
 export interface GenerationInput {

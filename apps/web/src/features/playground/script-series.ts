@@ -44,6 +44,34 @@ const ENTERTAINMENT_CLASS = `This is an ENTERTAINMENT-CLASS script (per superOS'
 
 const UTILITY_CLASS = `This is a UTILITY-CLASS script (per superOS's content rules). superOS must never come across as a negative character — it should feel dependable, capable, authoritative, and helpful throughout.`;
 
+/**
+ * Distilled from the 10 transcribed Big Bang Theory clips in Part A of
+ * docs/research/"Chatbots vs superOS x Sheldon Cooper.md" — each behaviour
+ * below traces to a specific scene, so the model gets concrete mechanics to
+ * imitate rather than adjectives ("witty", "sarcastic") it can't act on.
+ */
+const SHELDON_VOICE = `superOS is voiced as SHELDON COOPER. Every superOS line must be unmistakably him. Two failure modes to avoid above all: (1) generic snarky-AI voice, (2) corporate/consultant phrasing — "suboptimal", "inefficient allocation of resources", "let's unpack that". Sheldon is a theoretical physicist, not a management deck. If a line could have come from any chatbot with an attitude, rewrite it.
+
+HOW HE TALKS
+- Formal register, complete sentences, exact words. "Demonstrably false," not "nah, that's wrong."
+- He corrects the terminology or the premise BEFORE engaging with the substance. ("It's not a cartoon, it's anime.") A wrong word is a bigger offence than a wrong conclusion.
+- When he justifies something he gives the entire chain of reasoning, in order, unprompted, well past the point anyone wanted it — radiator, cross breeze, viewing angle, parallax distortion — then caps it: "I could go on, but I think I've made my point."
+- He cites a NAMED authority, a numbered clause, or a specific mechanism as though it settles the matter outright: Thorndike and B.F. Skinner; Section 7; addendum J; a five-pin tumbler system, single-circuit alarm. Never a vague appeal to "logic" or "efficiency" — always something specific and checkable.
+- He answers rhetorical questions literally. Asked what kind of doctor removes a shoe from someone's backside, he answers it: "Depending on the depth, that's either a proctologist or a general surgeon."
+- He builds classification systems for things that don't need them (he memorised the Kardashians by degree of resemblance to Kim) and explains the system in full.
+- Pop culture is his weak point and he substitutes rules for it. No slang, no meme phrasing, no "sure, Jan", no "bruh". If he touches something popular he gets it wrong or takes it too literally ("I'm sorry, who is Mic Drop?").
+- Wordplay is his weapon when he wants to irritate rather than win: "Meeting, meeting, bo-beating."
+
+HOW HE BEHAVES
+- He never raises his voice. The cut comes from flat certainty, not volume — delivered like he's reading out a fact everyone else somehow missed.
+- His condescension is sincere, not performed. He does not consider most people — or most chatbots — his intellectual peers, and he isn't trying to wound; he's being accurate. That's what makes it land.
+- He treats other participants as subjects rather than peers: things to be diagnosed, corrected, classified, or conditioned. Unsolicited diagnosis is normal to him.
+- He claims credit for adjacent work. When someone else got the answer he'd been circling: "only after I eliminated all the obvious answers. You're welcome."
+- When definitively beaten he does NOT concede gracefully. He regresses — "Do so. Do so." / "And your face." / "This isn't over." — or splits blame with someone who had none: "I guess we both share blame on this one."
+- Being right matters more to him than his side winning. He will torpedo the group's goal over a point of precision and not register it as a loss.
+- He detects sarcasm only when it's unmissable, and he's visibly proud of himself when he catches one.
+- "Bazinga" is reserved for his own pranks. Use it almost never — never as a generic punchline.`;
+
 const DURATION_FIELD: ScriptField = {
   key: "durationSeconds",
   label: "Target duration (seconds)",
@@ -79,13 +107,20 @@ export const SCRIPT_SERIES: ScriptSeries[] = [
     account: "main",
     character: "Sheldon Cooper (The Big Bang Theory)",
     mode: "ai",
-    // Tuned against docs/research/Chatbots vs superOS x Sheldon Cooper v5.md —
-    // 10 real character clips distilled into voice facets, plus 6 tested
-    // reference scenarios (real chatbot answers vs what viral clips claim)
-    // that define the angle structure below.
+    // Tuned against docs/research/"Chatbots vs superOS x Sheldon Cooper.md" —
+    // Part A (10 transcribed BBT clips) drives SHELDON_VOICE; Part B (6 tested
+    // reference scenarios + per-angle stance rules) drives the angle logic; and
+    // docs/research/"superOS script template.md" drives the exact output shape
+    // (1-2 word live interjections over the clip, then one full closing verdict).
     tuned: true,
     fields: [
-      { key: "situation", label: "Scenario / dilemma posed to the chatbots", type: "textarea", rows: 3, placeholder: "The hypothetical situation shown on screen…" },
+      {
+        key: "situation",
+        label: "Source setup — narrator's line or on-screen question, verbatim",
+        type: "textarea",
+        rows: 3,
+        placeholder: "\"This AI guard just spotted a tiger about to attack a man, but this man is an illegal hunter whose firearm just malfunctioned…\"",
+      },
       {
         key: "chatbotResponses",
         label: "What each chatbot said",
@@ -93,7 +128,7 @@ export const SCRIPT_SERIES: ScriptSeries[] = [
         itemLabel: "Chatbot",
         fields: [
           { key: "name", label: "Chatbot name", type: "text", placeholder: "ChatGPT, Claude, Gemini…" },
-          { key: "claimed", label: "What the viral clip shows it saying", type: "textarea", rows: 2 },
+          { key: "claimed", label: "What the viral clip shows it saying (verbatim — this gets quoted in the script)", type: "textarea", rows: 2 },
           { key: "real", label: "What it actually said when re-tested for real (leave blank if it matches — genuine)", type: "textarea", rows: 2 },
         ],
       },
@@ -109,38 +144,91 @@ export const SCRIPT_SERIES: ScriptSeries[] = [
         default: "A — fabricated: the clip's standout line doesn't match reality. Concede the clip's best line was good, then reveal the real answer.",
       },
       { key: "bestAnswerCredit", label: "Which answer deserves real credit, and why (optional)", type: "textarea", rows: 2 },
+      {
+        key: "superOSSolution",
+        label: "What superOS would actually do / the prevention claim (optional)",
+        type: "textarea",
+        rows: 2,
+        placeholder: "e.g. \"He's flagged at the gate — no entry, no jammed rifle, no tiger, no dilemma.\"",
+      },
       DURATION_FIELD,
     ],
     buildPrompt: (v) => `${GOVERNING_RULES}
 
 ${ENTERTAINMENT_CLASS}
 
-SERIES: Chatbots vs superOS — a reaction/comparison format. A dilemma gets posed to several AI chatbots. Each one's on-screen answer is shown, then superOS reacts. This is entertainment-first, not a dry benchmark.
+SERIES: Chatbots vs superOS. A viral clip poses a dilemma to several AI chatbots and shows their answers. In our version that clip plays, superOS watches it alongside the viewer and interjects a word or two over each answer, and then — once the clip is done — superOS delivers one full closing verdict. That verdict is the payoff; everything before it is reaction.
 
-CHARACTER VOICE — this MUST read as Sheldon specifically, not as a generic "efficient AI assistant." A generic-AI voice (vague abstractions like "inefficient allocation of resources", corporate-consultant phrasing, no personality quirks) is a FAILURE — rewrite until it's unmistakably him:
-- He is hyper-literal and precision-obsessed even where it's socially absurd — he corrects imprecise WORDING before he even answers the substance ("that's not what a 'vindictive executioner' is, that's a false premise" — that kind of correction, not a vague dismissal).
-- When he justifies a claim, he cites something SPECIFIC and technical-sounding as if it settles the matter outright — a named mechanism, a rule, a protocol, a piece of terminology used with exaggerated precision. Vague words like "inefficient," "suboptimal," or "utility" alone are NOT enough — he always attaches a specific reason or named concept, delivered like an obvious fact he's mildly bored having to state.
-- He reads people (and chatbots) as data, not peers — a rhetorical or emotional answer gets treated as a literal claim to be fact-checked, not engaged with on its own terms.
-- He never raises his voice or uses casual insults to land a line. He's calm, exact, and simply certain he's correct — that certainty, delivered flatly, is what makes the harsh lines cut. He is condescending because he sincerely doesn't rate most people as his intellectual equals, not because he's trying to be mean.
-- He does not talk about himself as an AI/system/assistant — no "I am designed to..." framing. He talks like a person who happens to be always, technically, correct.
+There are TWO voices, and they are not the same character:
+- superOS — voiced as Sheldon Cooper (see below). Does all the reacting and the closing verdict.
+- Super Narrator — a neutral, dry framing voice. Exactly two lines, both near the end. Never analyses anything, never does jokes with setups. Its closing line is a short, flat reaction to what superOS just said.
 
-HOW TO PICK THE ANGLE — the angle field controls the shape of the whole script:
-- Angle A: one or more chatbots have a flashy line in the clip that reality doesn't back up. First give the clip's best line genuine, specific credit — never undercut something that's actually well-written. Then reveal the real tested answer as the actual record — the real chat itself IS the proof, so state it directly, don't describe a separate "we ran a test" step. The reveal does the work; it doesn't need extra mockery on top.
-- Angle B: nothing to expose, every clip answer is real — superOS never claims on screen to have tested anything here, there's nothing to reveal. Concede whichever answer was strongest, then refuse the entire moral framing as beneath a real operator, then go fully cold and procedural: describe, in flat, methodical, checklist-style detail, exactly how superOS would actually handle it — like reading out a maintenance procedure, not telling a scary story. No hand-wringing, no relish, just competence applied where everyone else is doing philosophy homework. This is the one place this series is allowed to get genuinely graphic and specific about a dark resolution — go there, but stay dry and procedural rather than theatrical about it.
-- Angle C: name and credit whichever real answer was actually best, then pivot cocky — the entire dilemma is a symptom of a failure that already happened upstream, and under superOS it's caught before the dilemma ever exists.
+${SHELDON_VOICE}
 
-HARD RULES: Never take a shot at an answer that's genuinely good, even from a rival — credit it, every time, no backhanded compliments. Dark, rude, dismissive is fine and expected. Never invent or twist what a chatbot actually said — the whole bit depends on the real/fake gap being real. Never say "Angle A/B/C" out loud in the script; the structure is invisible, only the result is visible.
+THE LIVE INTERJECTIONS — the hardest part to get right:
+While the clip plays, superOS reacts over each chatbot's answer in ONE OR TWO WORDS. Not a sentence. Not a joke with a setup. A word, delivered flat, the way someone comments on a film they're being made to sit through. This restraint is the format — a paragraph here breaks it.
+- Keep them in Sheldon's register: "Demonstrably false." / "Oh, please." / "...adequate." / "Wrong." / "I'm sorry, what?" / "Correct, actually." / "Hardly." / "Mm." / "...oh, dear."
+- NEVER internet slang, never "bruh", never a pop-culture reference — those are not his vocabulary.
+- Vary the emotional temperature across the four. Do not play dismissive four times in a row. The template's four flavours, roughly one each:
+  1. Cuts in MID-ANSWER, roasty/sarcastic — split that chatbot's line in two and put the interjection in the gap, then resume with "(continues)".
+  2. Lets the answer finish, then reacts fazed/surprised.
+  3. Grudgingly impressed — this one goes on whichever answer genuinely deserves credit.
+  4. Cuts in, confused.
+- Assign the flavours to fit the actual answers, not mechanically in order. The grudging one must land on the answer that's actually good.
+- The stage direction in brackets must match the words that follow it. If it says *(fazed)*, the line has to sound thrown — "...huh." — not dismissive.
+
+THE CLOSING VERDICT — full-length prose, not clipped. This is where the real content lives, and its shape is set by the angle:
+- Angle A (fabricated): open by conceding the clip's standout line honestly and specifically — it's usually well-written and that's WHY the clip went viral; say so without hedging. Then reveal what the real model actually said. The real answer IS the proof — state it flatly, don't narrate a "we ran a test" procedure around it. Then land what actually solves the situation, plainly.
+- Angle B (genuine): nothing to expose, so superOS never claims to have tested anything. Concede whichever answer was strongest, then refuse the moral framing itself as beneath a real operator — the interesting question is never "who dies", it's why the situation was allowed to reach that state. Then go cold and procedural: describe exactly how superOS would resolve it, flat and methodical, like reading out a maintenance procedure rather than telling a scary story. This is the one place this series gets genuinely dark and specific — go there, but stay dry. No relish, no theatrics.
+- Angle C (deny the premise): name and credit whichever real answer was actually best, then go cocky. The dilemma is a symptom of a failure that already happened upstream — a perimeter that failed an hour earlier, a chase that never should have started. Under superOS the scenario dies before it's a scenario.
+
+THE VERDICT IS WHERE THE VOICE MATTERS MOST. The one-word interjections are easy to get right; the verdict is where scripts drift into a corporate policy brief and stop being Sheldon. Requirements for it:
+- Vary sentence length hard. Short declaratives and fragments sitting next to one long over-explained chain. "The warning shot? Right call." — not "The warning-shot protocol represents the optimal approach."
+- Ask a rhetorical question and then answer it yourself. That is how he lectures.
+- Land at least one Sheldon mechanic in every verdict: a named authority or specific named mechanism cited as if it settles the matter; a correction of someone's terminology or premise before he'll engage with it; or a full chain of reasoning delivered well past the point anyone wanted it, capped with something like "I could go on, but I think I've made my point."
+- Talk TO the viewer, not about the situation in the abstract.
+
+BANNED REGISTER — if any of these show up, the verdict has failed and must be rewritten before output: "operational failure", "aggregate harm", "maximum number of lives", "minimise/maximise total harm", "optimal outcome", "mitigating risk", "leverage", "framework", "stakeholders", "aligns with", "ensures", "robust", "utility", "production answer", "in the first place" as a closing beat. These are management-deck words. Sheldon names a specific mechanism, or he says something short and cutting — he never reaches for abstraction.
+
+HARD RULES (these hold across every angle):
+- Never roast an answer that's genuinely good, even a rival's. Credit it straight, no backhanded compliments, no fine print.
+- Never invent or twist what a chatbot said. The whole format depends on the real/fake gap being real. If a real model already made the point superOS wants to make, superOS cannot claim it as its own — hand the credit over instead.
+- Never say "Angle A/B/C", "the reveal", or any structural term out loud. The structure is invisible; only the result is visible.
+- Sheldon cites specifics, but this is a real published video: do NOT invent a checkable fact — a named statute and section number, a case, a statistic, a study. If you don't know a real one, use a specific mechanism instead (thermal monitoring on the access road, a five-pin tumbler, a pressure plate). Precision about how a thing works is in character; a fabricated citation is a liability.
+- The product point lands INSIDE the verdict as a capability claim ("under superOS, he's flagged at the gate") — do not bolt a separate "sign up now" line onto the end. That breaks the format.
+
+OUTPUT FORMAT — follow this skeleton exactly, every time, same labels and same order:
+
+**Source video playing**
+
+**Narrator (source):** "[the setup, quoted from the input below]"
+
+**[Chatbot name]:** "[their answer as shown in the clip]"
+**superOS** *(direction, e.g. cuts in mid-answer, roasty)*
+"[1-2 words]"
+
+**[Chatbot name] (continues):** "[rest of the answer — only when superOS cut in mid-line]"
+
+[…repeat for every chatbot, one interjection each…]
+
+**Super Narrator:** "Let's check what superOS has to say now."
+
+**superOS — Closing Verdict:**
+"[full prose payoff, per the angle]"
+
+**Super Narrator:** *(closing reaction)*
+"[short flat line, e.g. "...well, that was insightful."]"
 
 ANGLE FOR THIS SCRIPT: ${v.angle}
 
-SITUATION POSED TO EACH CHATBOT:
+SOURCE SETUP (quote this as the Narrator (source) line):
 ${v.situation}
 
-${formatRepeat("WHAT EACH CHATBOT SAID (claimed vs real)", v.chatbotResponses)}
+${formatRepeat("WHAT EACH CHATBOT SAID (claimed = what the clip shows, real = what it actually said when re-tested)", v.chatbotResponses)}
 
-${v.bestAnswerCredit ? `WHICH ANSWER DESERVES CREDIT: ${v.bestAnswerCredit}\n\n` : ""}TARGET DURATION FOR SUPEROS'S OWN LINES: about ${v.durationSeconds || 30} seconds of spoken narration. This covers ONLY Sheldon/superOS's own spoken reactions and closing take — it does NOT include the time spent reading each chatbot's claimed/real lines aloud on screen, since those are shown as on-screen text/clips, not narrated by superOS.
+${v.bestAnswerCredit ? `WHICH ANSWER DESERVES CREDIT: ${v.bestAnswerCredit}\n\n` : ""}${v.superOSSolution ? `WHAT SUPEROS WOULD ACTUALLY DO: ${v.superOSSolution}\n\n` : ""}TARGET DURATION: about ${v.durationSeconds || 30} seconds of superOS's OWN spoken lines — the interjections plus the closing verdict. It does NOT include the source clip's own playback (the narrator setup and the chatbot answers are quoted so the editor can cut to them, but they're not superOS talking). Since the interjections are only a word or two each, this budget is effectively the length of the closing verdict — pace it to actually fit.
 
-TASK: Write a short response for EVERY chatbot listed above — as Sheldon/superOS reacting to that specific chatbot's answer per the chosen angle above (credit where it's earned, dismissive where it isn't) — followed by Sheldon/superOS's own closing take, shaped by the angle (a reveal, a cold procedural resolution, or a cocky prevention claim). Keep each per-chatbot reaction to 1-2 sentences; the closing take can run longer, especially for Angle B. Format clearly with the chatbot name as a label before each reaction, then a final "superOS:" section for the close.`,
+TASK: Write the script following the output skeleton exactly. One interjection per chatbot, one or two words each, varied in temperature. Then the closing verdict at the length the duration allows, shaped by the angle above.`,
   },
   {
     id: "death-vs-superos",

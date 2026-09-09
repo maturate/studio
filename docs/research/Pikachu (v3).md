@@ -10,18 +10,18 @@ In the transcript, a Ash addresses Pikachu, who is buzzing and acting distant wh
 
 \[gentle music\] \[Pikachu buzzing\]   
 Ash : Oh. Pikachu, are you gonna be like this the whole way?   
-Pikachu : Pi.   
+Pikachu : Pi. (Pikachu annoyed)  
 Ash : Is it because you don't like me?   
-Pikachu : Pika, Pika.   
+Pikachu : Pika, Pika. (pikachu nods and says yes)   
 Ash : Well, I like you a lot. And since you're the Pokemon I'm training, don't you think you could be a little nicer and just open your mouth and tell me what's wrong?   
-Pikachu : Cha.   
+Pikachu : Cha. (pikachu doesn’t care and opens his mouth wide)   
 Ash : Uh, that's not exactly what I meant. Is your name all you can say?   
-Pikachu : Pika.
+Pikachu : Pika. (pikachu nods and says yes still showing no emotion)
 
 2. **Video 2**  
    
 
-[https://www.instagram.com/reel/Ccinq5MgA-I/?utm\_source=ig\_web\_copy\_link\&igsi=MzRlODBiNWFlZA==](https://www.instagram.com/reel/Ccinq5MgA-I/?utm_source=ig_web_copy_link&igsi=MzRlODBiNWFlZA==)
+[https://www.instagram.com/reel/Ccinq5MgA:I/?utm\_source=ig\_web\_copy\_link\&igsi=MzRlODBiNWFlZA==](https://www.instagram.com/reel/Ccinq5MgA-I/?utm_source=ig_web_copy_link&igsi=MzRlODBiNWFlZA==)
 
 **Summary**
 
@@ -29,29 +29,29 @@ Ash and his companions discuss Pikachu’s resolute determination following its 
 
 **Transcript**
 
-Ash \- Pikachu.   
-Pikachu \- Pika, Pikachu, pika. Pi, pi, pi, Pikachu. Cha. Pika, Pikachu.   
-Team Rocket \- It's so brave.   
-Team Rocket \- So tell us what Pikachu's saying.   
-Team Rocket \- Pikachu won't change. If it's going to beat the Raichu, it wants to do it just as it is.   
-Team Rocket \- You mean it's going to battle again as a Pikachu?   
-Team Rocket \- It's going to fight in the name of all Pikachu.   
-Team Rocket \- \[laughs\] Really? That's so beautiful.   
-Ash \- Pikachu, together you and I will beat Lieutenant Surge and his Raichu.   
-Pikachu \- Pika, pika.   
-Misty \- You're both crazy.   
-Brock \- You should change your strategy, Ash. Maybe use your other Pokemon.   
-Ash \- It's hard, but it's not impossible. Pikachu and I will find a way to win.   
-Pikachu \- Pika, Pikachu, pika.   
-Team Rocket \- Huh?   
-Team Rocket \- Pikachu will prove it can beat Raichu. It will defend its honor and Ash's.   
-Team Rocket \- Oh, dear. That's magnificent.   
-Ash \- All right. Are we all charged up?
+Ash : Pikachu.   
+Pikachu : Pika, Pikachu, pika. Pi, pi, pi, Pikachu. Cha. Pika, Pikachu. (pikachu explains in a very motivated way and is assuring Ash that we can defeat Raichu, explains with a lot of expressions)  
+Team Rocket : It's so brave.   
+Team Rocket : So tell us what Pikachu's saying.   
+Team Rocket : Pikachu won't change. If it's going to beat the Raichu, it wants to do it just as it is.   
+Team Rocket : You mean it's going to battle again as a Pikachu?   
+Team Rocket : It's going to fight in the name of all Pikachu.   
+Team Rocket : \[laughs\] Really? That's so beautiful.   
+Ash : Pikachu, together you and I will beat Lieutenant Surge and his Raichu.   
+Pikachu : Pika, pika. (pikachu says yess with enthusiasm)  
+Misty : You're both crazy.   
+Brock : You should change your strategy, Ash. Maybe use your other Pokemon.   
+Ash : It's hard, but it's not impossible. Pikachu and I will find a way to win.   
+Pikachu : Pika, Pikachu, pika. (pikachu says with determination)  
+Team Rocket : Huh?   
+Team Rocket : Pikachu will prove it can beat Raichu. It will defend its honor and Ash's.   
+Team Rocket : Oh, dear. That's magnificent.   
+Ash : All right. Are we all charged up?
 
 3. **Video 3**  
    
 
-[https://www.instagram.com/reel/DW5Zqrmku-9/?utm\_source=ig\_web\_copy\_link\&igsi=MzRlODBiNWFlZA==](https://www.instagram.com/reel/DW5Zqrmku-9/?utm_source=ig_web_copy_link&igsi=MzRlODBiNWFlZA==)
+[https://www.instagram.com/reel/DW5Zqrmku:9/?utm\_source=ig\_web\_copy\_link\&igsi=MzRlODBiNWFlZA==](https://www.instagram.com/reel/DW5Zqrmku-9/?utm_source=ig_web_copy_link&igsi=MzRlODBiNWFlZA==)
 
 **Summary**
 
@@ -59,15 +59,15 @@ Pikachu and Squirtle engage in an intense vocal exchange, repeatedly calling out
 
 **Transcript**
 
-Pikachu \- Pika, pika. Pikachu. Pika, pika. Pikachu.   
+Pikachu : Pika, pika. Pikachu. Pika, pika. Pikachu. (pikachu making faces at togepi so that she stops crying)  
 Squirt. Squirtle. \[babbling\] \[screeching\] Squirtle.   
-Pikachu \- Pika. Pikachu.   
+Pikachu : Pika. Pikachu. (pikachu happy and enthusiastic to make togepi stop crying)  
 Squirtle. Squirt, squirt, Squirtle.   
-Pikachu \- Pika.   
+Pikachu : Pika.   
 Squirtle.   
-Pikachu \- Pika. \[singing\] \[screeching\] \[water splashing\] \[singing\]   
+Pikachu : Pika. \[singing\] \[screeching\] \[water splashing\] \[singing\]   
 Fine. \[screeching\] Fine, fine, fine. \[screeching\]   
-Pikachu \- Pika, pika, pika. \[screeching\]   
+Pikachu : Pika, pika, pika. \[screeching\] (Pikachu shocked and angry when a pokemon eats the apple they had found for Togepi)   
 Bulbasaur. Bulba. Bulba. Bulbasaur. Bulba. Bulba.
 
 4. **Video 4**   
@@ -77,11 +77,11 @@ Bulbasaur. Bulba. Bulba. Bulbasaur. Bulba. Bulba.
 
 **Summary**
 
-Based on the transcript provided, Pikachu makes multiple high-pitched utterances ("Pika, pika, pika pi"), followed by the appearance or mention of Charmander. Subsequently, Squirtle engages in a repetitive series of five verbalizations ("Squirtle, Squirtle, Squirtle, Squirtle, Squirtle") before escalating the situation with three forceful exclamations ("Squirt, squirt, squirt\!").
+Based on the transcript provided, Pikachu makes multiple high:pitched utterances ("Pika, pika, pika pi"), followed by the appearance or mention of Charmander. Subsequently, Squirtle engages in a repetitive series of five verbalizations ("Squirtle, Squirtle, Squirtle, Squirtle, Squirtle") before escalating the situation with three forceful exclamations ("Squirt, squirt, squirt\!").
 
 **Transcript**
 
-Pikachu \- Pika, pika, pika pi.   
+Pikachu : Pika, pika, pika pi. (Says I dont see ash anywhere: is tired and exhausted because they are lost and trying to find the others)  
 Charmander.   
 Squirtle, Squirtle, Squirtle, Squirtle, Squirtle. Squirt, squirt, squirt\!
 
@@ -97,7 +97,7 @@ The transcript consists entirely of Pikachu repeatedly shouting its own name ("P
 
 **`Transcript`**
 
-Pikachu \- Pikachu\! Pika\! Pika\! Pika\! Pika\!
+Pikachu : Pikachu\! Pika\! Pika\! Pika\! Pika\! (pikachu shouting when it finds that the food is stolen and somebody has eaten it, it faints and starts crying)
 
 6. **Video 6** 
 
@@ -111,22 +111,22 @@ An unidentified person attempts to convince Pikachu to leave Ash and become thei
 
 **`Transcript`**
 
-Pikachu \- Pika.   
-Zackie \- Hmm. Come on, Pikachu.   
-Pikachu \- Pi.   
-Zackie \- Forget about Ash and be my Pokemon.   
-Pikachu \- Pika?  
-Zackie \- What's so great about him anyway? Wouldn't you rather be my Pokemon?   
-Pikachu \- Pika, pika.   
-Zackie \- Okay, then I'm just gonna take you.   
-Pikachu \- Pika\! \[screech\] Pika. Ah\! Pika\! Pikachu,   
-Zackie \- quit it.  
-Pikachu \- Pika.   
-Zackie \- Are you okay? Go away\!
+Pikachu : Pika. (pikachu looking concerned)  
+Zackie : Hmm. Come on, Pikachu.   
+Pikachu : Pi.   
+Zackie : Forget about Ash and be my Pokemon.   
+Pikachu : Pika? (shoked)  
+Zackie : What's so great about him anyway? Wouldn't you rather be my Pokemon?   
+Pikachu : Pika, pika. (pikachu denying and saying no)  
+Zackie : Okay, then I'm just gonna take you.   
+Pikachu : Pika\! \[screech\] Pika. Ah\! Pika\! Pikachu, (pikachu very angry and annoyed by zackie)  
+Zackie : quit it.  
+Pikachu : Pika.   
+Zackie : Are you okay? Go away\!
 
 7. **Video 7**
 
-   [https://www.instagram.com/reel/C3p-woqxYNy/?utm\_source=ig\_web\_copy\_link\&igsi=MzRlODBiNWFlZA==](https://www.instagram.com/reel/C3p-woqxYNy/?utm_source=ig_web_copy_link&igsi=MzRlODBiNWFlZA==)
+   [https://www.instagram.com/reel/C3p:woqxYNy/?utm\_source=ig\_web\_copy\_link\&igsi=MzRlODBiNWFlZA==](https://www.instagram.com/reel/C3p-woqxYNy/?utm_source=ig_web_copy_link&igsi=MzRlODBiNWFlZA==)
 
    
 
@@ -138,12 +138,12 @@ In the transcript, Pikachu is heard making a variety of vocalizations. The chara
 
 **`Transcript`**
 
-Pikachu \- \[Pikachu sounds\] Pikachu.   
-Pikachu \- Pi. \[gasps\] Pi.   
+Pikachu : \[Pikachu sounds\] Pikachu.   
+Pikachu : Pi. \[gasps\] Pi.   
 Uh.   
-Pikachu \- ka.   
+Pikachu : ka.   
 Uh.   
-Pikachu \- chu.   
+Pikachu : chu. (looks innocent and unfazed by the ball hitting)  
 Uh. \[laughs\]
 
 8. **Video 8** 
@@ -158,12 +158,12 @@ Pikachu excitedly runs up while panting, repeating its name. It then encounters 
 
 **`Transcript`**
 
-Pikachu \- Pika\! \[panting\] Pika, pika, pika, pika, pika. \[shimmer\] Pika, pika\!   
-Delia \- Oh my. Is that Pokémon food? Pikachu.   
-Ash \- Brock gave it all to us.   
-Delia \- How nice. You were traveling with Brock?   
-Ash \- And Misty too.   
-Delia \- I hope they're both-
+Pikachu : Pika\! \[panting\] Pika, pika, pika, pika, pika. \[shimmer\] Pika, pika\!  (pikachu very excited and happy, jumping with excitement, eating with joy)  
+Delia : Oh my. Is that Pokémon food? Pikachu.   
+Ash : Brock gave it all to us.   
+Delia : How nice. You were traveling with Brock?   
+Ash : And Misty too.   
+Delia : I hope they're both:
 
 9. **Video 9**   
    [https://www.instagram.com/reel/C7uqOzDMeV2/?utm\_source=ig\_web\_copy\_link\&igsi=MzRlODBiNWFlZA==](https://www.instagram.com/reel/C7uqOzDMeV2/?utm_source=ig_web_copy_link&igsi=MzRlODBiNWFlZA==)  
@@ -175,11 +175,11 @@ Pikachu approaches the speaker, expressing a strong desire to battle a Gloom. Aw
 
 **`Transcript`**
 
-Pikachu \- Pikachu  
-Ash \- Pikachu?   
-Pikachu \- Pika.   
-Ash \- You're saying you want to battle? Pikachu. You know you're probably gonna lose, but you're still willing to battle Gloom to help me out?   
-Pikachu \- Pika, pika.   
-Ash \- What? You say you're sure you'll win?   
-Pikachu \- Pika.
+Pikachu : Pikachu (pikachu serious)   
+Ash : Pikachu?   
+Pikachu : Pika.   
+Ash : You're saying you want to battle? Pikachu. You know you're probably gonna lose, but you're still willing to battle Gloom to help me out?   
+Pikachu : Pika, pika. (pikachu is determined to win)  
+Ash : What? You say you're sure you'll win?   
+Pikachu : Pika. (saying yes confidently)
 

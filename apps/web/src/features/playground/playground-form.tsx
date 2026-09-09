@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { MODEL_REGISTRY, defaultSettingsFor, estimateCost, type ModelCategory } from "@superos/model-registry";
-import type { DataType } from "@superos/shared";
+import { resolveAttachmentTags, type DataType } from "@superos/shared";
 import { enqueueGenerationAction, getLatestRunForModelAction, getRunOutputPreviewsAction, pollRunStatusAction, resolveAssetSeedAction } from "./actions";
 import { AttachmentsPicker, type Attachment } from "./attachments-picker";
 import { SttPanel } from "./stt-panel";
@@ -115,6 +115,68 @@ export function PlaygroundForm({
   const [pendingCount, setPendingCount] = useState(isResuming ? (latestRun?.count ?? 1) : 0);
   const [activeSeedAction, setActiveSeedAction] = useState<PlaygroundSeed["action"] | null>(seed?.action ?? null);
   const [seedError, setSeedError] = useState<string | null>(null);
+
+  // "@" mention autocomplete for tagging a specific attachment in the prompt —
+  // mentionQuery is the text typed after the triggering "@" (null = closed).
+  const promptRef = useRef<HTMLTextAreaElement>(null);
+  const [mentionQuery, setMentionQuery] = useState<string | null>(null);
+  const [mentionIndex, setMentionIndex] = useState(0);
+  const mentionMatches = useMemo(() => {
+    if (mentionQuery === null) return [];
+    const q = mentionQuery.toLowerCase();
+    return attachments
+      .map((a, i) => ({ ...a, tagIndex: i + 1 }))
+      .filter((a) => !q || a.title.toLowerCase().includes(q));
+  }, [mentionQuery, attachments]);
+
+  function detectMentionQuery(value: string, cursor: number): string | null {
+    const uptoCursor = value.slice(0, cursor);
+    const at = uptoCursor.lastIndexOf("@");
+    if (at === -1) return null;
+    const between = uptoCursor.slice(at + 1);
+    if (/\s/.test(between)) return null; // whitespace after "@" ends the mention
+    return between;
+  }
+
+  function handlePromptChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
+    setPrompt(e.target.value);
+    setMentionQuery(detectMentionQuery(e.target.value, e.target.selectionStart ?? e.target.value.length));
+    setMentionIndex(0);
+  }
+
+  function insertMention(tagIndex: number) {
+    const el = promptRef.current;
+    const cursor = el?.selectionStart ?? prompt.length;
+    const uptoCursor = prompt.slice(0, cursor);
+    const at = uptoCursor.lastIndexOf("@");
+    if (at === -1) return;
+    const tag = `@attachment-${tagIndex} `;
+    const nextPrompt = prompt.slice(0, at) + tag + prompt.slice(cursor);
+    setPrompt(nextPrompt);
+    setMentionQuery(null);
+    requestAnimationFrame(() => {
+      const pos = at + tag.length;
+      el?.focus();
+      el?.setSelectionRange(pos, pos);
+    });
+  }
+
+  function handlePromptKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (mentionQuery === null || mentionMatches.length === 0) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setMentionIndex((i) => (i + 1) % mentionMatches.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setMentionIndex((i) => (i - 1 + mentionMatches.length) % mentionMatches.length);
+    } else if (e.key === "Enter" || e.key === "Tab") {
+      e.preventDefault();
+      insertMention(mentionMatches[mentionIndex].tagIndex);
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      setMentionQuery(null);
+    }
+  }
 
   // The output box must only ever reflect the currently selected model's own
   // history — pollUntilDone can span a model switch (it keeps running against
@@ -286,7 +348,10 @@ export function PlaygroundForm({
     try {
       const { runId } = await enqueueGenerationAction({
         modelId,
-        prompt,
+        // "@attachment-1"/"@attachment-2" etc. in the prompt get swapped for that
+        // attachment's real title right before it reaches the model — the tag
+        // itself means nothing to the model, the name does.
+        prompt: resolveAttachmentTags(prompt, attachments.map((a) => a.title)),
         settings,
         folderId: folderId || null,
         attachments,
@@ -402,24 +467,70 @@ export function PlaygroundForm({
           </select>
         </div>
 
-        <div className="space-y-1.5">
+        <div className="relative space-y-1.5">
           <label className="text-xs font-medium font-mono uppercase tracking-wide text-ink/45">Prompt</label>
           <textarea
+            ref={promptRef}
             value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
+            onChange={handlePromptChange}
+            onKeyDown={handlePromptKeyDown}
+            onBlur={() => setMentionQuery(null)}
             rows={5}
             required={attachments.length === 0}
             placeholder={
               attachments.length > 0
-                ? "Optional when media is attached — describe the shot or leave blank…"
+                ? "Optional when media is attached — describe the shot or leave blank… (type @ to tag one)"
                 : "Describe what to generate…"
             }
             className="w-full resize-none rounded-none border border-ink/10 bg-ink/5 px-3 py-2 text-sm text-ink placeholder:text-ink/35 focus:border-ink/25 focus:outline-none"
           />
+          {mentionQuery !== null && mentionMatches.length > 0 && (
+            <div className="absolute left-0 right-0 top-full z-20 mt-1 max-h-48 overflow-y-auto border border-ink/15 bg-white shadow-lg">
+              {mentionMatches.map((m, i) => (
+                <button
+                  key={m.assetId}
+                  type="button"
+                  // onMouseDown (not onClick) fires before the textarea's onBlur, so
+                  // selecting an item doesn't first close the dropdown out from under it.
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    insertMention(m.tagIndex);
+                  }}
+                  onMouseEnter={() => setMentionIndex(i)}
+                  className={`flex w-full items-center gap-2 px-3 py-1.5 text-left text-sm ${
+                    i === mentionIndex ? "bg-[#004c37] text-white" : "text-ink/80 hover:bg-ink/5"
+                  }`}
+                >
+                  <code
+                    className={`shrink-0 rounded-none px-1 py-0.5 text-[10px] ${
+                      i === mentionIndex ? "bg-white/20" : "bg-ink/10 text-ink/60"
+                    }`}
+                  >
+                    @attachment-{m.tagIndex}
+                  </code>
+                  <span className="truncate">{m.title || "untitled"}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {attachableDataTypes.length > 0 && (
           <AttachmentsPicker dataTypes={attachableDataTypes} attachments={attachments} onChange={setAttachments} />
+        )}
+
+        {attachments.length > 1 && (
+          <p className="text-xs text-ink/40">
+            Reference a specific one in the prompt by position:{" "}
+            {attachments.map((a, i) => (
+              <span key={a.assetId}>
+                <code className="rounded-none bg-ink/10 px-1 py-0.5 text-ink/70">@attachment-{i + 1}</code>
+                {" → "}
+                {a.title || "untitled"}
+                {i < attachments.length - 1 ? "; " : ""}
+              </span>
+            ))}
+          </p>
         )}
 
         <div className="rounded-none border border-ink/10 bg-ink/5 p-3">

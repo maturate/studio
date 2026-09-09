@@ -6,8 +6,8 @@ export async function UserMenu() {
 
   return (
     <div className="flex items-center gap-3">
-      <div className="text-right leading-tight">
-        <p className="text-sm font-medium text-ink/90">
+      <div className="hidden text-right leading-tight sm:block">
+        <p className="max-w-[10rem] truncate text-sm font-medium text-ink/90">
           {session.user.name ?? session.user.email}
         </p>
         <p className="text-xs text-ink/45">{session.user.role}</p>

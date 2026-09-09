@@ -205,6 +205,12 @@ function NodeBody({
             onChange={(e) => patchData({ prompt: e.target.value })}
             placeholder="Prompt (used if no upstream prompt)…"
           />
+          <p className="text-[10px] text-ink/35">
+            Tag a wired reference by <code className="rounded-none bg-ink/10 px-1">@attachment-1</code>,{" "}
+            <code className="rounded-none bg-ink/10 px-1">@attachment-2</code>… in port order (Reference, Character,
+            Frames, Image, Video, Audio — only wired ones count). Resolved to that reference's real name before it
+            reaches the model.
+          </p>
           {modelId && (
             <div className="border-t border-ink/10 pt-2">
               <ModelSettingsFields
