@@ -18,9 +18,9 @@ export function resolvedValueToText(value: ResolvedValue | undefined): string | 
 
 export function resolvedValueToReference(value: ResolvedValue | undefined): ReferenceInput | undefined {
   if (!value) return undefined;
-  if (value.kind === "asset") return { url: value.url, mimeType: value.mimeType, name: value.name };
+  if (value.kind === "asset") return { url: value.url, mimeType: value.mimeType, name: value.name, source: "asset" };
   if ((value.kind === "reference" || value.kind === "character") && value.url && value.mimeType) {
-    return { url: value.url, mimeType: value.mimeType, name: value.name };
+    return { url: value.url, mimeType: value.mimeType, name: value.name, source: value.kind };
   }
   return undefined;
 }

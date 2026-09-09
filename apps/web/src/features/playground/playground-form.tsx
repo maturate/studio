@@ -3,9 +3,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { MODEL_REGISTRY, defaultSettingsFor, estimateCost, type ModelCategory } from "@superos/model-registry";
-import { resolveAttachmentTags, type DataType } from "@superos/shared";
+import { computeAttachmentTags, resolveAttachmentTags, type DataType } from "@superos/shared";
 import { enqueueGenerationAction, getLatestRunForModelAction, getRunOutputPreviewsAction, pollRunStatusAction, resolveAssetSeedAction } from "./actions";
-import { AttachmentsPicker, type Attachment } from "./attachments-picker";
+import { AttachmentsPicker, uploadFilesAsAttachments, type Attachment } from "./attachments-picker";
 import { SttPanel } from "./stt-panel";
 import { ScriptPanel } from "./script-panel";
 import { ModelSettingsFields } from "@/features/shared/model-settings-fields";
@@ -121,13 +121,18 @@ export function PlaygroundForm({
   const promptRef = useRef<HTMLTextAreaElement>(null);
   const [mentionQuery, setMentionQuery] = useState<string | null>(null);
   const [mentionIndex, setMentionIndex] = useState(0);
+  // @image-1 / @video-1 / @Sheldon Cooper — named after what the thing actually
+  // is, and by their own name for anything picked from the Reference/Character
+  // library. Computed once here and reused by the dropdown, the hint line and
+  // the substitution at submit time, so all three can never disagree.
+  const attachmentTags = useMemo(() => computeAttachmentTags(attachments), [attachments]);
   const mentionMatches = useMemo(() => {
     if (mentionQuery === null) return [];
     const q = mentionQuery.toLowerCase();
     return attachments
-      .map((a, i) => ({ ...a, tagIndex: i + 1 }))
-      .filter((a) => !q || a.title.toLowerCase().includes(q));
-  }, [mentionQuery, attachments]);
+      .map((a, i) => ({ ...a, tag: attachmentTags[i]?.tag ?? "" }))
+      .filter((a) => !q || a.tag.toLowerCase().includes(q) || a.title.toLowerCase().includes(q));
+  }, [mentionQuery, attachments, attachmentTags]);
 
   function detectMentionQuery(value: string, cursor: number): string | null {
     const uptoCursor = value.slice(0, cursor);
@@ -144,13 +149,13 @@ export function PlaygroundForm({
     setMentionIndex(0);
   }
 
-  function insertMention(tagIndex: number) {
+  function insertMention(tagName: string) {
     const el = promptRef.current;
     const cursor = el?.selectionStart ?? prompt.length;
     const uptoCursor = prompt.slice(0, cursor);
     const at = uptoCursor.lastIndexOf("@");
     if (at === -1) return;
-    const tag = `@attachment-${tagIndex} `;
+    const tag = `@${tagName} `;
     const nextPrompt = prompt.slice(0, at) + tag + prompt.slice(cursor);
     setPrompt(nextPrompt);
     setMentionQuery(null);
@@ -159,6 +164,28 @@ export function PlaygroundForm({
       el?.focus();
       el?.setSelectionRange(pos, pos);
     });
+  }
+
+  const [pasteError, setPasteError] = useState<string | null>(null);
+  const [pasting, setPasting] = useState(false);
+
+  /** Pasting a file/image/audio into the prompt attaches it, rather than
+   * dropping a useless filename into the text (or nothing at all). */
+  async function handlePromptPaste(e: React.ClipboardEvent<HTMLTextAreaElement>) {
+    const files = Array.from(e.clipboardData?.files ?? []);
+    if (files.length === 0) return; // plain text paste, leave it alone
+    e.preventDefault();
+    setPasteError(null);
+    setPasting(true);
+    try {
+      const uploaded = await uploadFilesAsAttachments(files);
+      const fresh = uploaded.filter((u) => !attachments.some((a) => a.assetId === u.assetId));
+      if (fresh.length > 0) setAttachments([...attachments, ...fresh]);
+    } catch (err) {
+      setPasteError(err instanceof Error ? err.message : "Couldn't attach the pasted file");
+    } finally {
+      setPasting(false);
+    }
   }
 
   function handlePromptKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
@@ -171,7 +198,7 @@ export function PlaygroundForm({
       setMentionIndex((i) => (i - 1 + mentionMatches.length) % mentionMatches.length);
     } else if (e.key === "Enter" || e.key === "Tab") {
       e.preventDefault();
-      insertMention(mentionMatches[mentionIndex].tagIndex);
+      insertMention(mentionMatches[mentionIndex].tag);
     } else if (e.key === "Escape") {
       e.preventDefault();
       setMentionQuery(null);
@@ -348,10 +375,10 @@ export function PlaygroundForm({
     try {
       const { runId } = await enqueueGenerationAction({
         modelId,
-        // "@attachment-1"/"@attachment-2" etc. in the prompt get swapped for that
-        // attachment's real title right before it reaches the model — the tag
-        // itself means nothing to the model, the name does.
-        prompt: resolveAttachmentTags(prompt, attachments.map((a) => a.title)),
+        // "@image-1"/"@Sheldon Cooper" etc. get swapped for that attachment's
+        // real name right before it reaches the model — the tag itself means
+        // nothing to the model, the name does.
+        prompt: resolveAttachmentTags(prompt, attachmentTags),
         settings,
         folderId: folderId || null,
         attachments,
@@ -474,6 +501,7 @@ export function PlaygroundForm({
             value={prompt}
             onChange={handlePromptChange}
             onKeyDown={handlePromptKeyDown}
+            onPaste={handlePromptPaste}
             onBlur={() => setMentionQuery(null)}
             rows={5}
             required={attachments.length === 0}
@@ -494,7 +522,7 @@ export function PlaygroundForm({
                   // selecting an item doesn't first close the dropdown out from under it.
                   onMouseDown={(e) => {
                     e.preventDefault();
-                    insertMention(m.tagIndex);
+                    insertMention(m.tag);
                   }}
                   onMouseEnter={() => setMentionIndex(i)}
                   className={`flex w-full items-center gap-2 px-3 py-1.5 text-left text-sm ${
@@ -506,7 +534,7 @@ export function PlaygroundForm({
                       i === mentionIndex ? "bg-white/20" : "bg-ink/10 text-ink/60"
                     }`}
                   >
-                    @attachment-{m.tagIndex}
+                    @{m.tag}
                   </code>
                   <span className="truncate">{m.title || "untitled"}</span>
                 </button>
@@ -515,18 +543,20 @@ export function PlaygroundForm({
           )}
         </div>
 
+        {pasting && <p className="text-xs text-ink/40">Attaching pasted file…</p>}
+        {pasteError && <p className="text-xs text-red-600">{pasteError}</p>}
+
         {attachableDataTypes.length > 0 && (
           <AttachmentsPicker dataTypes={attachableDataTypes} attachments={attachments} onChange={setAttachments} />
         )}
 
         {attachments.length > 1 && (
           <p className="text-xs text-ink/40">
-            Reference a specific one in the prompt by position:{" "}
+            Tag one in the prompt:{" "}
             {attachments.map((a, i) => (
               <span key={a.assetId}>
-                <code className="rounded-none bg-ink/10 px-1 py-0.5 text-ink/70">@attachment-{i + 1}</code>
-                {" → "}
-                {a.title || "untitled"}
+                <code className="rounded-none bg-ink/10 px-1 py-0.5 text-ink/70">@{attachmentTags[i]?.tag}</code>
+                {attachmentTags[i]?.tag === a.title ? "" : ` → ${a.title || "untitled"}`}
                 {i < attachments.length - 1 ? "; " : ""}
               </span>
             ))}
@@ -595,6 +625,24 @@ export function PlaygroundForm({
         {!error && pendingCount === 0 && resultAssets.length === 0 && (
           <div className="rounded-none border border-dashed border-ink/15 px-6 py-16 text-center text-sm text-ink/40">
             Generated output will appear here and save to the Asset Library.
+          </div>
+        )}
+
+        {error && resultAssets.length === 0 && (
+          <div className="rounded-none border border-ink/10 bg-ink/5 p-3">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              <div
+                title={error}
+                className="group relative flex aspect-square cursor-help flex-col items-center justify-center gap-1 border border-red-500/30 bg-red-500/10 p-2 text-center"
+              >
+                <span className="text-xl">⚠️</span>
+                <span className="text-[10px] text-red-700">Generation failed</span>
+                <span className="text-[9px] text-red-700/70">hover for details</span>
+                <span className="pointer-events-none absolute inset-0 hidden overflow-y-auto bg-black/85 p-2 text-left text-[9px] leading-snug text-white group-hover:block">
+                  {error}
+                </span>
+              </div>
+            </div>
           </div>
         )}
 

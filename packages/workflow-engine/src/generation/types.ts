@@ -3,9 +3,11 @@ export interface ReferenceInput {
   url: string;
   mimeType: string;
   /** Display name (asset title / reference title / character name) — used to
-   * resolve `@attachment-N` tags in the prompt to something the model can
-   * actually anchor to, via `resolveAttachmentTags` (packages/shared). */
+   * resolve `@image-1` / `@Sheldon Cooper` style tags in the prompt, via
+   * `resolveAttachmentTags` (packages/shared). */
   name?: string;
+  /** Where it came from. Library items are tagged by name, assets by type+index. */
+  source?: "asset" | "reference" | "character";
 }
 
 export interface GenerationInput {

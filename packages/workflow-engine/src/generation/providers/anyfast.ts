@@ -73,7 +73,11 @@ async function pollTask(
   getUrl: string,
   apiKey: string,
   extractUrl: (json: unknown) => string | undefined,
-  { maxPolls = 90, intervalMs = 5000 } = {},
+  // 20 minutes. This runs in the media worker, not an HTTP request, so a long
+  // wait costs nothing — and 7.5 minutes was demonstrably too short: real
+  // Seedance/Kling video jobs timed out here while still running fine on
+  // AnyFast's side, which surfaced to the user as a failure for no reason.
+  { maxPolls = 240, intervalMs = 5000 } = {},
 ): Promise<{ url: string; raw: unknown }> {
   for (let i = 0; i < maxPolls; i++) {
     await new Promise((r) => setTimeout(r, intervalMs));
@@ -91,7 +95,9 @@ async function pollTask(
       throw new Error(`AnyFast task failed: ${getTaskFailReason(json)}`);
     }
   }
-  throw new Error(`AnyFast task timed out polling ${getUrl}`);
+  throw new Error(
+    `AnyFast task still wasn't finished after ${Math.round((maxPolls * intervalMs) / 60000)} minutes, so we stopped waiting. The job may still complete on AnyFast's side. Task: ${getUrl}`,
+  );
 }
 
 async function downloadAsBuffer(url: string): Promise<{ data: Buffer; mimeType: string | null }> {

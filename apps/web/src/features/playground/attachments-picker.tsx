@@ -11,6 +11,43 @@ export interface Attachment {
   mimeType: string;
   type: string;
   title: string;
+  /** Where it came from — library items get tagged by their own name in
+   * prompts, uploads/assets get tagged by type and index (@image-1). */
+  source?: "asset" | "reference" | "character";
+}
+
+/**
+ * Uploads files and resolves them to attachments. Exported so the prompt box
+ * can reuse it for clipboard paste, rather than duplicating the upload dance.
+ */
+export async function uploadFilesAsAttachments(files: File[]): Promise<Attachment[]> {
+  const out: Attachment[] = [];
+  for (const file of files) {
+    const { uploadUrl, storageKey } = await requestUploadUrlAction({
+      filename: file.name || `pasted-${Date.now()}`,
+      contentType: file.type || "application/octet-stream",
+    });
+    const putRes = await fetch(uploadUrl, {
+      method: "PUT",
+      headers: { "Content-Type": file.type || "application/octet-stream" },
+      body: file,
+    });
+    if (!putRes.ok) throw new Error(`Upload failed for ${file.name || "pasted file"} (${putRes.status})`);
+
+    const asset = await confirmUploadAction({
+      storageKey,
+      filename: file.name || `pasted-${Date.now()}`,
+      contentType: file.type || "application/octet-stream",
+      folderId: null,
+      sizeBytes: file.size,
+    });
+    if (!asset) continue;
+    const [resolved] = await resolveAttachmentsAction([asset.id]);
+    // confirmUploadAction already maps the mime type to an asset type, so an
+    // uploaded/pasted image comes back as type "image" without extra work.
+    if (resolved) out.push({ ...resolved, source: "asset" });
+  }
+  return out;
 }
 
 type PickerKind = "asset" | "reference" | "character";
@@ -56,7 +93,7 @@ export function AttachmentsPicker({
     onChange(attachments.filter((a) => a.assetId !== assetId));
   }
 
-  function add(item: { assetId: string; url: string; mimeType: string; type: string; title: string }) {
+  function add(item: Attachment) {
     if (attachments.some((a) => a.assetId === item.assetId)) return;
     onChange([...attachments, item]);
   }
@@ -66,29 +103,8 @@ export function AttachmentsPicker({
     setUploading(true);
     setUploadError(null);
     try {
-      for (const file of Array.from(files)) {
-        const { uploadUrl, storageKey } = await requestUploadUrlAction({
-          filename: file.name,
-          contentType: file.type || "application/octet-stream",
-        });
-        const putRes = await fetch(uploadUrl, {
-          method: "PUT",
-          headers: { "Content-Type": file.type || "application/octet-stream" },
-          body: file,
-        });
-        if (!putRes.ok) throw new Error(`Upload failed for ${file.name} (${putRes.status})`);
-
-        const asset = await confirmUploadAction({
-          storageKey,
-          filename: file.name,
-          contentType: file.type || "application/octet-stream",
-          folderId: null,
-          sizeBytes: file.size,
-        });
-        if (asset) {
-          const [resolved] = await resolveAttachmentsAction([asset.id]);
-          if (resolved) add(resolved);
-        }
+      for (const uploaded of await uploadFilesAsAttachments(Array.from(files))) {
+        add(uploaded);
       }
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : "Upload failed");
@@ -176,7 +192,16 @@ export function AttachmentsPicker({
         <AttachmentPickerModal
           kind={openPicker.kind}
           dataTypes={openPicker.dataTypes}
-          onPick={(item) => add({ assetId: item.assetId, url: item.previewUrl!, mimeType: item.mimeType ?? "", type: item.type, title: item.title })}
+          onPick={(item) =>
+            add({
+              assetId: item.assetId,
+              url: item.previewUrl!,
+              mimeType: item.mimeType ?? "",
+              type: item.type,
+              title: item.title,
+              source: openPicker.kind,
+            })
+          }
           onClose={() => setOpenPicker(null)}
         />
       )}

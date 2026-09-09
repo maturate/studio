@@ -85,9 +85,9 @@ const OMNI_SETTINGS: SettingField[] = [
     label: "Duration (seconds)",
     type: "number",
     min: 2,
-    max: 30,
+    max: 10,
     default: 8,
-    hint: "Sent as a duration hint — Google hasn't published the exact accepted range for this preview model.",
+    hint: "Max is 10 — the API rejects anything longer (\"Generation duration 12 exceeds maximum duration 10\", confirmed live).",
   },
   {
     key: "thinkingLevel",

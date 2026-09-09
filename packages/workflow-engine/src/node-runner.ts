@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { eq } from "drizzle-orm";
 import { assets, characters, db, one, references } from "@superos/db";
 import { estimateCost, getModelById } from "@superos/model-registry";
-import { resolveAttachmentTags } from "@superos/shared";
+import { computeAttachmentTags, resolveAttachmentTags } from "@superos/shared";
 import { buildAssetStorageKey, createDownloadUrl, putObject } from "@superos/storage";
 import {
   getChunksForSourceRefs,
@@ -205,11 +205,21 @@ export async function executeNode(
       const basePrompt = resolvedValueToText(inputs.prompt) ?? (data.prompt as string | undefined) ?? "";
       const rawPrompt = contextText ? `${contextText}\n\n---\n\n${basePrompt}` : basePrompt;
       const references = collectReferences(inputs);
-      // "@attachment-1"/"@attachment-2" etc. in the prompt resolve to each wired
-      // reference-type port's real name, in the same order collectReferences
-      // gathered them (reference, character, frames, image, video, audio —
-      // only wired ports count) — see packages/shared/src/attachment-tags.ts.
-      const prompt = resolveAttachmentTags(rawPrompt, references.map((r) => r.name));
+      // "@image-1" / "@video-1" / "@Sheldon Cooper" style tags in the prompt
+      // resolve to each wired reference port's real name. Assets are numbered
+      // per type in the order collectReferences gathered them (reference,
+      // character, frames, image, video, audio — only wired ports count);
+      // library items are tagged by their own name. See packages/shared.
+      const prompt = resolveAttachmentTags(
+        rawPrompt,
+        computeAttachmentTags(
+          references.map((r) => ({
+            type: r.mimeType?.split("/")[0],
+            title: r.name,
+            source: r.source,
+          })),
+        ),
+      );
       const outputPort = node.type === "image_generator" ? "image" : node.type === "audio_generator" ? "audio" : "video";
 
       const { assetIds, failures } = await generateAndSaveAsset(
