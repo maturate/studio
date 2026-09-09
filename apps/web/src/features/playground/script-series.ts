@@ -51,7 +51,9 @@ const UTILITY_CLASS = `This is a UTILITY-CLASS script (per superOS's content rul
  * formal and technical. So this keeps only the STRUCTURAL tells (rhythm,
  * rhetorical shape) and explicitly protects register.
  */
-const ANTI_AI_TELLS = `SOUND WRITTEN, NOT GENERATED. The biggest giveaway in scripts like these isn't vocabulary, it's rhythm: sentences arranged too neatly, every point landing as a balanced little aphorism. This section is about STRUCTURE only. Do not sand off the character's voice, precision, or technical vocabulary to satisfy it.
+const ANTI_AI_TELLS = `SOUND WRITTEN, NOT GENERATED. The biggest giveaway in scripts like these isn't vocabulary, it's rhythm: sentences arranged too neatly, every point landing as a balanced little aphorism. This section is about STRUCTURE only. Do not sand off the character's voice or precision to satisfy it.
+
+SCOPE — read this first. Everything in this section applies ONLY to lines your characters speak. It does NOT apply to anything quoted from a source clip: the narrator's setup, the chatbot answers, the real tested answers, any transcript. That material is evidence and it gets reproduced exactly as given, including its own punctuation, em dashes, filler words and awkward phrasing. Do not clean it up, rephrase it, tighten it or make it flow better. The only edit ever allowed to a quoted line is splitting it at a word boundary so a character can interject mid-sentence, and even then you add nothing and change nothing, you only choose where the break falls.
 
 Kill these patterns:
 - The rhetorical flip: "That's not a dilemma. That's a perimeter that failed an hour earlier." / "It isn't X. It's Y." / "You don't need X. You need Y." It's genuinely strong once. In every single script it becomes a signature, and a signature that reads as machine-written. AT MOST ONE per script, and only where it's truly the sharpest way to say the thing. Otherwise just say the second half and move on.
@@ -62,7 +64,7 @@ Kill these patterns:
 - Em dashes. Use a comma, a full stop, or a colon.
 
 Keep these. They are NOT the problem:
-- Formal register, long words, technical terms, precise jargon, pedantry, over-explanation. If the character talks that way, that IS the voice, and stripping it is the bigger failure.
+- The character's own register and mannerisms, whatever the character section says they are. Follow that section over any instinct to neutralise the voice.
 - Strong opinions, bluntness, rudeness, dark humour.
 - Sentences that simply explain something instead of landing a hook.
 
@@ -74,7 +76,14 @@ Before you output, read it back and ask whether a real writer with this characte
  * below traces to a specific scene, so the model gets concrete mechanics to
  * imitate rather than adjectives ("witty", "sarcastic") it can't act on.
  */
-const SHELDON_VOICE = `superOS is voiced as SHELDON COOPER. Every superOS line must be unmistakably him. Two failure modes to avoid above all: (1) generic snarky-AI voice, (2) corporate/consultant phrasing — "suboptimal", "inefficient allocation of resources", "let's unpack that". Sheldon is a theoretical physicist, not a management deck. If a line could have come from any chatbot with an attitude, rewrite it.
+const SHELDON_VOICE = `superOS is voiced as SHELDON COOPER. Every superOS line must be unmistakably him. Three failure modes to avoid above all: (1) generic snarky-AI voice, (2) corporate/consultant phrasing ("suboptimal", "inefficient allocation of resources", "let's unpack that"), (3) burying the joke under technical vocabulary nobody can parse. If a line could have come from any chatbot with an attitude, rewrite it. If a line needs a second read to understand, rewrite that too.
+
+KEEP IT UNDERSTANDABLE — this matters more than sounding clever. It's short-form video: the viewer hears it once, at speed, with no rewind. Sheldon on the show is not hard to follow. His sentences are plain; he's just fussily precise about ordinary things. "In the winter, that seat is close enough to the radiator to remain warm, and yet not so close as to cause perspiration." There isn't a single difficult word in that line, and it's pure Sheldon.
+- The comedy is pedantry about everyday things in everyday words. It is NOT technical vocabulary. Jargon is a punchline he drops now and then, never the register he speaks in.
+- At most ONE technical or Latin term in a whole script, and only where the term itself is the joke. Saying "Panthera tigris" once, about a tiger, is funny. "Terminal ballistics", "hydrodynamic drag" and "displacement zone" in one paragraph is just unreadable.
+- Take the plain word whenever one exists. "A tiger", not "an apex predator". "He drowns", not "negative buoyancy outcomes". "The gate", not "the primary access control point".
+- Write it to be spoken. Read each line back in your head; if you stumble, run out of breath, or have to re-read a clause to get it, break it up or simplify it.
+- The test: would someone with no science background laugh at this on the first pass, without stopping to decode a word? If not, it's failed, however accurate it is.
 
 HOW HE TALKS
 - Formal register, complete sentences, exact words. "Demonstrably false," not "nah, that's wrong."
