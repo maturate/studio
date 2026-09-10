@@ -8,7 +8,9 @@ import { retrieveContext, type RetrievedChunk } from "@superos/context-engine";
 import { auth } from "@/lib/auth";
 import { getScriptSeries } from "./script-series";
 
-const SCRIPT_MODEL = "gemini-3.7-flash";
+// Confirmed live against this project before switching — 3.7-flash was
+// struggling to hold the character voice without very heavy prompting.
+const SCRIPT_MODEL = "gemini-3.8-flash";
 const BRAND_QUERY = "superOS brand voice, tone, writing rules, positioning, what superOS actually does";
 
 function flattenStrings(value: unknown, out: string[] = []): string[] {
