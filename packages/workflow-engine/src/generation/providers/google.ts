@@ -84,6 +84,10 @@ async function callGenerateContent(
   return { inlineParts, raw: json };
 }
 
+/** Transient Vertex failures: rate limit, and the two server-side blips it returns under load. */
+const RETRYABLE_STATUSES = new Set([429, 500, 503]);
+const TEXT_RETRY_DELAYS_MS = [3000, 9000];
+
 /**
  * Plain text generation (no media) — used by transform/context nodes, not
  * the media adapter registry. `gemini-omni-flash-preview` cannot be called
@@ -92,17 +96,34 @@ async function callGenerateContent(
  * generateContent-capable text model, confirmed live against this project.
  */
 export async function geminiGenerateText(prompt: string, model: string = "gemini-2.5-flash"): Promise<string> {
-  const token = await getVertexAccessToken();
-  const res = await fetch(vertexModelUrl(model, "generateContent"), {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: prompt }] }] }),
-  });
-  if (!res.ok) throw new Error(`Vertex AI text generation error: ${res.status} ${await res.text()}`);
-  const json = (await res.json()) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
-  const text = json.candidates?.[0]?.content?.parts?.map((p) => p.text ?? "").join("") ?? "";
-  if (!text) throw new Error("Vertex AI text generation returned no text");
-  return text;
+  let lastError: Error | null = null;
+
+  // Vertex hands out 429 RESOURCE_EXHAUSTED on a per-minute quota, which two
+  // script generations in quick succession are enough to hit. It clears in
+  // seconds, so retry rather than failing the user's request outright.
+  for (let attempt = 0; attempt < TEXT_RETRY_DELAYS_MS.length + 1; attempt++) {
+    const token = await getVertexAccessToken();
+    const res = await fetch(vertexModelUrl(model, "generateContent"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: prompt }] }] }),
+    });
+
+    if (res.ok) {
+      const json = (await res.json()) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
+      const text = json.candidates?.[0]?.content?.parts?.map((p) => p.text ?? "").join("") ?? "";
+      if (!text) throw new Error("Vertex AI text generation returned no text");
+      return text;
+    }
+
+    lastError = new Error(`Vertex AI text generation error: ${res.status} ${await res.text()}`);
+    const delay = TEXT_RETRY_DELAYS_MS[attempt];
+    if (!RETRYABLE_STATUSES.has(res.status) || delay === undefined) throw lastError;
+    // Jitter so parallel callers don't retry in lockstep and re-exhaust the quota.
+    await new Promise((r) => setTimeout(r, delay + Math.floor(Math.random() * 1000)));
+  }
+
+  throw lastError ?? new Error("Vertex AI text generation failed");
 }
 
 /** Summary of an STT transcript at a target word count, via a real second Gemini call (gemini-3.5-flash-lite, confirmed live against this project). */

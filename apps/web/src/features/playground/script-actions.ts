@@ -41,19 +41,40 @@ function formatContextBlock(chunks: RetrievedChunk[]): string {
   return `KNOWLEDGE BASE CONTEXT — ground this script in the real brand voice and this series' actual documented mechanic. Don't contradict anything below; don't invent product claims not supported here:\n\n${body}\n\n---\n\n`;
 }
 
+/**
+ * Turns a provider failure into something the operator can act on. Worth doing
+ * properly because a thrown Server Action error reaches the browser as a bare
+ * "Minified React error #441" in production — Next strips the message to avoid
+ * leaking server details, so anything we want the user to read has to travel
+ * back as data instead.
+ */
+function describeFailure(err: unknown): string {
+  const raw = err instanceof Error ? err.message : String(err);
+  if (raw.includes("RESOURCE_EXHAUSTED") || raw.includes("429")) {
+    return `Vertex AI is rate-limited right now (429). ${SCRIPT_MODEL} has a per-minute quota and we already retried twice. Wait about a minute and generate again.`;
+  }
+  if (raw.includes("403") || raw.includes("PERMISSION_DENIED")) {
+    return `Vertex AI refused the request for ${SCRIPT_MODEL} (403). The model may not be enabled for this project.`;
+  }
+  if (raw.includes("returned no text")) {
+    return "The model returned an empty response — usually a safety filter on the source material. Try rewording the situation or the chatbot answers.";
+  }
+  return raw;
+}
+
 export async function generateScriptAction(
   seriesId: string,
   values: Record<string, unknown>,
-): Promise<{ script: string; assetId: string | null }> {
+): Promise<{ script: string | null; assetId: string | null; error: string | null }> {
   const session = await auth();
   if (!session?.user?.isAuthorized) {
-    throw new Error("Not authorized");
+    return { script: null, assetId: null, error: "Not authorized" };
   }
 
   const series = getScriptSeries(seriesId);
-  if (!series) throw new Error(`Unknown script series: ${seriesId}`);
+  if (!series) return { script: null, assetId: null, error: `Unknown script series: ${seriesId}` };
   if (series.mode !== "ai" || !series.buildPrompt) {
-    throw new Error(`${series.label} is written manually — there's nothing to generate.`);
+    return { script: null, assetId: null, error: `${series.label} is written manually — there's nothing to generate.` };
   }
 
   const seriesQuery = [series.label, series.character, ...flattenStrings(values)].join(" — ").slice(0, 2000);
@@ -64,7 +85,13 @@ export async function generateScriptAction(
   const contextBlock = formatContextBlock(dedupeChunks([brandChunks, seriesChunks]).slice(0, 10));
 
   const prompt = contextBlock + series.buildPrompt(values);
-  const script = await geminiGenerateText(prompt, SCRIPT_MODEL);
+  let script: string;
+  try {
+    script = await geminiGenerateText(prompt, SCRIPT_MODEL);
+  } catch (err) {
+    console.error("Script generation failed", err);
+    return { script: null, assetId: null, error: describeFailure(err) };
+  }
 
   const key = buildAssetStorageKey("assets", `script-${randomUUID()}.txt`);
   await putObject(key, Buffer.from(script, "utf-8"), "text/plain");
@@ -82,5 +109,5 @@ export async function generateScriptAction(
     })
     .returning();
 
-  return { script, assetId: asset?.id ?? null };
+  return { script, assetId: asset?.id ?? null, error: null };
 }

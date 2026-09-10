@@ -42,6 +42,10 @@ export function ScriptPanel() {
     setAssetId(null);
     try {
       const result = await generateScriptAction(series.id, values);
+      if (result.error || !result.script) {
+        setError(result.error ?? "Script generation failed");
+        return;
+      }
       setScript(result.script);
       setAssetId(result.assetId);
     } catch (err) {

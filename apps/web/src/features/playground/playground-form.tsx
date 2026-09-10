@@ -694,6 +694,10 @@ function OutputTile({
     }
   }
 
+  // Rendered as a SIBLING of the tile's preview button, never inside it: this
+  // bar contains buttons, and a <button> inside a <button> is invalid HTML. The
+  // browser silently closes the outer one, so the DOM stops matching what React
+  // rendered and hydration fails. Same layout the Asset Library card uses.
   const actionBar = (
     <div className="pointer-events-none absolute inset-x-0 bottom-0 flex gap-1 bg-gradient-to-t from-black/75 to-transparent p-1 opacity-0 transition group-hover:opacity-100">
       {canEdit && (
@@ -730,11 +734,13 @@ function OutputTile({
   if (asset.type === "image") {
     return (
       <>
-        <button type="button" onClick={openPreview} className="group relative block aspect-square overflow-hidden bg-ink/10">
-          <img src={asset.previewUrl} alt="" className="h-full w-full object-cover" />
-          {previewLoading && <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-[10px] text-white">Loading…</div>}
+        <div className="group relative aspect-square overflow-hidden bg-ink/10">
+          <button type="button" onClick={openPreview} className="block h-full w-full">
+            <img src={asset.previewUrl} alt="" className="h-full w-full object-cover" />
+          </button>
+          {previewLoading && <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/40 text-[10px] text-white">Loading…</div>}
           {actionBar}
-        </button>
+        </div>
         {previewData && (
           <AssetPreviewModal
             asset={previewData}
@@ -756,12 +762,14 @@ function OutputTile({
   if (asset.type === "video") {
     return (
       <>
-        <button type="button" onClick={openPreview} className="group relative block aspect-square bg-black">
-          <video src={asset.previewUrl} muted playsInline preload="metadata" className="h-full w-full object-contain" />
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-3xl text-white/90">▶</div>
-          {previewLoading && <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-[10px] text-white">Loading…</div>}
+        <div className="group relative aspect-square bg-black">
+          <button type="button" onClick={openPreview} className="block h-full w-full">
+            <video src={asset.previewUrl} muted playsInline preload="metadata" className="h-full w-full object-contain" />
+            <span className="pointer-events-none absolute inset-0 flex items-center justify-center text-3xl text-white/90">▶</span>
+          </button>
+          {previewLoading && <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/40 text-[10px] text-white">Loading…</div>}
           {actionBar}
-        </button>
+        </div>
         {previewData && (
           <AssetPreviewModal
             asset={previewData}
@@ -791,14 +799,16 @@ function OutputTile({
 
   return (
     <>
-      <button
-        type="button"
-        onClick={openPreview}
-        className="group relative flex aspect-square items-center justify-center bg-ink/10 text-[10px] text-ink/40 hover:text-ink/70"
-      >
-        Open file →
+      <div className="group relative aspect-square bg-ink/10">
+        <button
+          type="button"
+          onClick={openPreview}
+          className="flex h-full w-full items-center justify-center text-[10px] text-ink/40 hover:text-ink/70"
+        >
+          Open file →
+        </button>
         {actionBar}
-      </button>
+      </div>
       {previewData && (
         <AssetPreviewModal
           asset={previewData}
