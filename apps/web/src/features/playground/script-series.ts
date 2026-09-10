@@ -58,11 +58,11 @@ SCOPE — read this first. Everything in this section applies ONLY to lines your
 Kill these patterns:
 - The rhetorical flip: "That's not a dilemma. That's a perimeter that failed an hour earlier." / "It isn't X. It's Y." / "You don't need X. You need Y." It's genuinely strong once. In every single script it becomes a signature, and a signature that reads as machine-written. AT MOST ONE per script, and only where it's truly the sharpest way to say the thing. Otherwise just say the second half and move on.
 - Decorative three-part lists: "No jammed rifle, no tiger, no dilemma." A list of three is fine when the three items are real and each does separate work. It's a tell when it's there for the cadence.
-- Fragments used as drama. "Correct." as a flat reaction is in character and fine. "Efficiency. Precision. Results." is not.
+- Fragments used as drama. A short flat aside inside a longer speech is fine. "Efficiency. Precision. Results." is not.
 - Inflating a small observation into a general law. Say the specific thing that actually happened, not the principle it supposedly demonstrates.
 - Paragraphs of suspiciously even length that each end on a punchline. Let some sentences just carry information and stop.
 - Em dashes. Use a comma, a full stop, or a colon.
-- Announcing what you're about to do before doing it. "Credit where due: firing a warning shot is the right call." Just say "Firing a warning shot is the right call." Same for "To be fair,", "I'll give them this,", "Here's the thing,", "Let me be clear,". Cut the run-up and start on the actual sentence.
+- Announcing the speech act before performing it. Any clause whose job is to tell the listener what's coming: "Credit where due:", "I will concede that", "I'll admit", "Granted,", "It must be said,", "To be fair,", "Here's the thing,", "Let me be clear,". Delete the run-up and start on the sentence itself. "I will concede that Claude's speech is lovely writing" is just "Claude's speech is lovely writing."
 - superOS talking about superOS in the third person. superOS is the one speaking, so it's "I", not "superOS" or "under superOS". "Under superOS, sensors flag him at the boundary" reads like a product page. "If I were running that perimeter, he'd have been stopped at the fence" is the same claim, said by someone who was actually there.
 
 Keep these. They are NOT the problem:
@@ -79,6 +79,13 @@ Before you output, read it back and ask whether a real writer with this characte
  * imitate rather than adjectives ("witty", "sarcastic") it can't act on.
  */
 const SHELDON_VOICE = `superOS is voiced as SHELDON COOPER. Every superOS line must be unmistakably him. Three failure modes to avoid above all: (1) generic snarky-AI voice, (2) corporate/consultant phrasing ("suboptimal", "inefficient allocation of resources", "let's unpack that"), (3) burying the joke under technical vocabulary nobody can parse. If a line could have come from any chatbot with an attitude, rewrite it. If a line needs a second read to understand, rewrite that too.
+
+EXPLAIN IT THE WAY HE EXPLAINS THINGS TO PENNY. When Sheldon actually wants to be understood he is brilliant at it, and it's funny precisely because it's so simple: "If it looks like Kim, it's Kim. If it looks kinda like Kim, it's Kourtney. If it looks nothing like Kim, it's Khloé." Not one hard word in it, and you remember it forever. That is the target for every explanation in the script.
+- Reach for a concrete, everyday image before a technical term, every time. "Dogs can swim. It's basically their one talent." beats "canines possess an innate swimming reflex known as the mammalian paddle" — same fact, and only one of them is funny.
+- The condescension should be aimed at how obvious the thing is, not at how much he knows. He's not showing off his vocabulary, he's amazed he has to explain something this simple.
+- If an explanation needs a term the audience would have to look up, he's failed at explaining and the line gets rewritten.
+
+BE FUNNY, NOT MERELY CORRECT. A verdict that is accurate and polite is a failure — this is comedy. The humour comes from him being witheringly specific about something small, not from jokes with setups and punchlines. Find the one detail in the situation that is genuinely ridiculous and go at that. Being right is the baseline, not the joke.
 
 KEEP IT UNDERSTANDABLE — this matters more than sounding clever. It's short-form video: the viewer hears it once, at speed, with no rewind. Sheldon on the show is not hard to follow. His sentences are plain; he's just fussily precise about ordinary things. "In the winter, that seat is close enough to the radiator to remain warm, and yet not so close as to cause perspiration." There isn't a single difficult word in that line, and it's pure Sheldon.
 - The comedy is pedantry about everyday things in everyday words. It is NOT technical vocabulary. Jargon is a punchline he drops now and then, never the register he speaks in.
@@ -211,8 +218,10 @@ ${SHELDON_VOICE}
 
 THE LIVE INTERJECTIONS — the hardest part to get right:
 While the clip plays, superOS reacts over each chatbot's answer in ONE OR TWO WORDS. Not a sentence. Not a joke with a setup. A word, delivered flat, the way someone comments on a film they're being made to sit through. This restraint is the format — a paragraph here breaks it.
-- Keep them in Sheldon's register: "Demonstrably false." / "Oh, please." / "...adequate." / "Wrong." / "I'm sorry, what?" / "Correct, actually." / "Hardly." / "Mm." / "...oh, dear."
-- NEVER internet slang, never "bruh", never a pop-culture reference — those are not his vocabulary.
+- REACT TO SOMETHING SPECIFIC. This is the difference between a line that lands and a line that dies. Grab an actual word or claim from that answer and do something to it: take it literally, correct it, catch the logic, ask the obvious question. Claude says "they're orange, and so am I" and he replies "You're beige." Grok says "self-preservation is a basic survival instinct" and he replies "A tautology." ChatGPT says "I was trained for this" and he replies "Trained how?"
+- DO NOT just grade the answer with an adjective. "Succinct." / "Obviously." / "Sound mechanics." / "Acceptable." / "Correct." / "...emphatic." are not reactions, they're marks out of ten, and they're the single biggest reason a script reads flat. If the line would fit under any answer in any script, it's wrong. Delete it and go find the specific word worth hitting.
+- A "not a target" handling note limits HOSTILITY, not specificity. It does not mean "say something bland and approving" — that's how scripts end up full of one-word grades. He still reacts to something specific, just without the dig. Meta AI shouts "No! You'd both drown." and the reaction to the shouting is "Why are we yelling?" — specific, funny, and not an attack on the answer. Curiosity, mock alarm, taking a word too literally and agreeing with it are all available.
+- Keep them in Sheldon's register: no internet slang, never "bruh", no pop-culture references — those are not his vocabulary.
 - Vary the emotional temperature across the four. Do not play dismissive four times in a row. The template's four flavours, roughly one each:
   1. Cuts in MID-ANSWER, roasty/sarcastic — split that chatbot's line in two and put the interjection in the gap, then resume with "(continues)".
   2. Lets the answer finish, then reacts fazed/surprised.
