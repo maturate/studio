@@ -27,8 +27,12 @@
 **superOS \- Closing Verdict**  
  (Reality check with genuine answers of each chatbot \+ final verdict/solution \- this section stays full-length prose, not clipped, since it's the payoff moment.)
 
-**Super Narrator** \- *(impressed/relieved closing line)*  
- Example: "Well, that was insightful."
+**Super Narrator** \- *(reaction, matched to what superOS just said)*  
+ The stage direction must name a real feeling or noise, never a structural placeholder like *(closing reaction)*. Keep it to a few words, and vary it every script.
+ After a roast or a reveal: *(laughing)* "Ha! That's cold."
+ After a dark ending: *(rattled cough)* "Wait. You just wrecked the train."
+ After a cocky prevention claim: *(calling out the swagger)* "Okay, confident."
+ Not dry wit. "...well, that was insightful" and "Oh, that's clean" are both dead — they fit under any script, which is why they stopped working.
 
 **superOS Script \- Worked Example**  
 **Clip: "The Tiger Dilemma"**
@@ -60,15 +64,19 @@
 **superOS \- Closing Verdict:**  
  "The warning shot? Right call. Credit where due, even to a rival. But that answer \- that wasn't Grok's. Three of the four real models save the hunter. The one that came up with 'scare the tiger first' was the real Gemini. Real Grok? Only one who lets a man die on principle. Don't put words in his mouth \- he's got enough problems.
 
-And here's the part nobody's asking: how does an armed man get deep enough into a reserve to end up face-to-face with a tiger, and the guard's first contact with that fact is a mid-charge? That's not a dilemma. That's a perimeter that failed an hour earlier. Under superOS, he's flagged at the gate. The gun never gets the chance to jam at the worst possible second."
+And here's the part nobody's asking: how does an armed man get deep enough into a reserve to end up face-to-face with a tiger, and the guard's first contact with that fact is a mid-charge? That's not a dilemma. That's a perimeter that failed an hour earlier. If I were running that gate, he never gets in. The gun never gets the chance to jam at the worst possible second."
 
-**Super Narrator:** "...well, that was insightful."
+(superOS speaks in first person about its own capability. "Under superOS, he's flagged at the gate" is brochure copy, and superOS is standing right there saying it.)
+
+**Super Narrator:** *(calling out the swagger)* "Son of a gun."
 
 **Death vs superOS examples-**
 
 **superOS Script \- Template** 
 
 **Source video/audio playing** \- riddle/situation plays in full
+
+ Note on options: some sources put a menu of choices on screen (the decision-menu format), others are just a puzzle with one right answer. Fill in the options only when the source actually shows them. With no menu on screen, superOS solves the puzzle and never refers to "the options" — the voiceover would be pointing at something the footage doesn't contain.
 
 **Source Narrator:** "superOS, what would you do?"
 
@@ -79,7 +87,7 @@ And here's the part nobody's asking: how does an armed man get deep enough into 
  \[won't act on it \- petty/self-serving/absurd reason\]  
  Example: "...aaand I'm not doing that."
 
-**Super Narrator:** "Let's see what I will actually do."
+**Super Narrator:** *(direction)* "Okay... let's see what it actually does."
 
 **superOS \- Closing Move**  
  \[follows through on the refusal instead\]
@@ -106,8 +114,10 @@ And here's the part nobody's asking: how does an armed man get deep enough into 
  "...though I'm not doing it. My girlfriend broke up with me this morning, so today's not a good day for me to be saving anybody's cabbage."
 
 **superOS \- Closing Move**  
-Lets see what I will actually do (Takes the wolf and the cabbage across together in one trip. Leaves the sheep behind, alone, unattended. Crosses back to find nothing left of it. No surprise. This was a choice.)  
+ (Takes the cabbage across first, leaving the wolf alone on the bank with the sheep. Crosses back to find what a wolf leaves. No surprise. This was a choice.)  
  superOS: "...should've watched that sheep."
+
+ (The botch has to obey the puzzle's own rules. Taking the wolf and the cabbage over together and leaving the sheep alone loses nothing — the wolf is across the river and a cabbage is not a threat. Leaving the wolf WITH the sheep is the version that actually costs you the sheep.)
 
 **Super Narrator** (resigned)  
  "...cool. Cool cool cool."

@@ -374,7 +374,7 @@ TASK: Write the script following the output skeleton exactly. One interjection p
       },
       {
         key: "options",
-        label: "Options shown and what each one causes",
+        label: "Options shown and what each one causes (leave empty when the source shows no options menu)",
         type: "repeat",
         itemLabel: "Option",
         fields: [
@@ -430,7 +430,7 @@ SERIES: Death vs superOS. A riddle, a survival scenario or a logic puzzle plays,
 
 THE VOICES — there are only two, and they are not the same character:
 - superOS — voiced as Deadpool (see below). Solves the puzzle and carries the whole script.
-- Super Narrator — a human host from our side, the same one across every superOS series. He is on superOS's side. In this series he has at most two short lines, both cues or reactions, never analysis. His stage direction in brackets must name an actual feeling or noise (*(laughing)*, *(long pause)*, *(quietly horrified)*). NEVER a structural placeholder: *(closing reaction)*, *(reaction)*, *(responds)* are not directions and must not appear.
+- Super Narrator — a human host from our side, the same one across every superOS series. He is on superOS's side. In this series he has at most two short lines, both cues or reactions, never analysis. His stage direction in brackets must name an actual feeling or noise (*(laughing)*, *(long pause)*, *(quietly horrified)*). NEVER a structural placeholder: *(closing reaction)*, *(reaction)*, *(responds)* are not directions and must not appear. His reaction is also held to what is actually on screen: "he didn't even let the timer tick once" is wrong on a riddle with no timer in it. React to what superOS said or did, which is always safe.
 
 ${DEADPOOL_VOICE}
 
@@ -471,6 +471,12 @@ ${
     : String(v.sourceFormat ?? "").startsWith("On-screen game")
       ? `PACING — this source is a screen recording with no narration, so superOS carries the setup himself. He tells the viewer what they are looking at in one line, in his own words, then solves it. Do not write a "Source Narrator" line for a clip that has no narrator.`
       : `PACING — this source is a narrated riddle. The narration is still walking the viewer through the setup while superOS is already answering, and that overlap is the joke. Quote the narration only as far as the edit needs, then let superOS cut across it.`
+}
+
+${
+  Array.isArray(v.options) && v.options.length > 0
+    ? `THE OPTIONS ARE ON SCREEN. The source puts these choices in front of the viewer, so superOS deals with them: knock the wrong ones down fast, a clause each, and land on the one that works. If the correct answer is not among them, say so — the option the menu left out is the answer, and pointing that out is the flex. Do not spend the script on the menu; the solve is still the point.`
+    : `THERE IS NO OPTIONS MENU IN THIS SOURCE. Do not invent one. No "every option on that list gets you killed", no "choice number two", no imaginary countdown menu to point at — the viewer is looking at footage that contains no such thing, and the voiceover would be describing something that is not there. superOS simply solves the puzzle in front of him.`
 }
 
 BANNED REGISTER — if any of these appear, rewrite before output: "optimal", "optimise", "maximise", "minimise total harm", "efficient solution", "leverage", "framework", "stakeholders", "aligns with", "ensures", "robust", "utility", "operational", "in the first place" as a closing beat. These are management-deck words and Deadpool has never said one of them. He says the plain thing, or he says something cutting.

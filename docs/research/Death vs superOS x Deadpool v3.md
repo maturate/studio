@@ -706,7 +706,9 @@ superOS doesn't panic about the wolf, the sheep, or the cabbage, it just sees th
 
 1. **Fast solve.** Delivered with zero hesitation, landed before the narrator finishes explaining the constraint: sheep across, return empty, wolf across, bring sheep back, drop sheep, cabbage across, return alone for sheep.
 2. **Refusal line.** "Yeah, I know the answer. My girlfriend broke up with me this morning, so today's not a good day for me to be saving anybody's cabbage."
-3. **Botch, deliberate.** Takes the wolf and the cabbage across together, leaves the sheep behind unattended, returns to find it eaten. Not a mistake, a choice, made visibly on purpose, which is where the humour sits.
+3. **Botch, deliberate.** Takes the cabbage across first, leaving the wolf alone on the bank with the sheep, and comes back to what a wolf leaves behind. Not a mistake, a choice, made visibly on purpose, which is where the humour sits.
+
+   Corrected from v2, which had him take the wolf and the cabbage across together and leave the sheep behind unattended. That version loses nothing: the wolf is on the far side of the river and a cabbage has never eaten anybody, so the sheep is in no danger and the botch has no consequence. The audience catches that instantly. The botch has to break the puzzle using the puzzle's own rules, so the wolf and the sheep have to be the pair left alone.
 
 **Direction**
 Hit all three beats fast and dry, with a clear timing gap against the narration. superOS has already landed on the sequence while the source is still explaining the setup. Tone swings from unbothered and flip (the puzzle was trivial) into the petty refusal, then the botch, rather than sitting in one register the whole way through.
@@ -763,13 +765,18 @@ A pair must walk together at the rate of the slower person.
 The lamp is enough for 30 sec only.
 
 **Why it's a good example**
-The visual language is the strongest thing about it: dark, minimal, a live counter ticking down, everything readable at a glance with no narration needed. It self-selects for an audience that enjoys proving it can do this, and that audience is loyal and comments confidently.
+The game itself carries the tension with no narration at all: a dark screen, five figures, one lamp, and a counter running down in plain sight. Everything a viewer needs is readable in a single glance, which is what a sound-off feed wants. The source being a playable Flash game rather than a found reel also means we control the footage — we can run the correct solve and the deliberate botch on the same screen, with the real counter ticking, instead of cutting around someone else's edit.
 
 **Why it fits the category**
 Strongest optimization angle in the set. Not just an answer, but a better answer than the obvious one, which sells the idea of superOS outperforming rather than just solving. It's also a clean setup for the dark angle's "I know it, I'm just not doing it" mechanic. Refusing the better answer is funnier than refusing a merely correct one.
 
 **Scene context**
 A family has to cross a bridge at night: a heavy man, an old man, a lady, a kid and a boy, all walking at different speeds. Nobody can cross without the lamp, the lamp lasts 30 seconds, and only two can be on the bridge at a time. Get all five across before the lamp dies.
+
+**Options and outcomes**
+Not applicable. This source shows no menu of choices, unlike ref_04 — it is an open optimisation puzzle, so there is nothing on screen for superOS to knock down. The script generator's options field is left empty for sources like this one, and superOS simply solves the puzzle rather than referring to "the options".
+
+The one contrast worth drawing is against the obvious-but-slower answer: escorting everyone across one at a time with the fastest walker looks efficient and blows the lamp, because the two slowest each cost a trip of their own. Pairing 8 and 12 together is the move that buys the win.
 
 **The solution**
 
@@ -857,8 +864,9 @@ Urgency and pacing carry this one. Short, clipped lines landing during the decis
 
 ### Part B
 
-- **ref_03 "why it's a good example" still describes the found reel**, the account framing and the loyal commenting audience. The source is now the Flash game, so that paragraph needs re-basing on the game.
-- **ref_03 has no options and outcomes table** and is written as a monologue rather than the three-beat block used by ref_01. Confirm whether that is the new house format for the dark angle or a one-off.
+- ~~**ref_03 "why it's a good example" still describes the found reel.**~~ Resolved: re-based on the Flash game.
+- ~~**ref_03 has no options and outcomes table.**~~ Resolved: the source has no on-screen menu, so the table is marked not applicable and the reason is written down. Options are per-source, not a required field — ref_01 and ref_04 have them, ref_02 and ref_03 do not. ref_03 is still written as a monologue rather than ref_01's three-beat block; the generator reads either, but the three-beat block is the clearer house format.
+- **ref_01's v2 botch was logically impossible** and is corrected above. Worth checking any other dark-angle botch written before this: the loss has to be something the puzzle's own rules can actually cause.
 - **The angle mix line named video_5**, which does not exist. Read as ref_04 here.
 - **Beat maps.** This series still has no per-reference beat map. ref_01, ref_02 and ref_04 carry source timestamps; ref_03 is a screen recording with no source video, so its timing has to be built during the voiceover pass.
 
