@@ -57,8 +57,25 @@ tar czf /tmp/deploy.tar.gz \
 # 3. Sanity-check no .env leaked into the tarball (must print 0).
 tar -tzf /tmp/deploy.tar.gz | grep -c "^\./\.env"
 
-# 4. Copy it to the VM.
+# 4. Copy it to the VM. ALWAYS check the exit code and verify the archive —
+#    scp to this VM regularly dies mid-stream ("Connection closed", exit 255)
+#    and leaves a TRUNCATED tarball behind. redeploy.sh will then extract a
+#    partial archive over a live source tree, which is the worst case.
 gcloud compute scp /tmp/deploy.tar.gz superos-studio:/tmp/superos-deploy.tar.gz --zone=us-central1-a
+echo "exit=$?"   # must be 0; a piped `tail` will hide this
+
+# Verify before extracting anything: both must match, and gzip -t must pass.
+md5 -q /tmp/deploy.tar.gz
+gcloud compute ssh superos-studio --zone=us-central1-a \
+  --command='md5sum /tmp/superos-deploy.tar.gz; gzip -t /tmp/superos-deploy.tar.gz && echo GZIP_OK || echo GZIP_CORRUPT'
+
+# If scp keeps failing (it failed 4 times in a row on 11 Sep 2026), skip it and
+# transfer in chunks instead — short ssh sessions survive even when long ones
+# don't. Split, send each piece with retries, checksum each piece, reassemble,
+# then verify the whole archive before running redeploy.sh.
+split -b 100k /tmp/deploy.tar.gz /tmp/dchunks/part-
+# ...per-chunk: gcloud compute ssh VM --command="cat > /tmp/dchunks/$b" < "$f"
+# ...then:     cat /tmp/dchunks/part-* > /tmp/superos-deploy.tar.gz && gzip -t it
 
 # 5. Run the redeploy script on the VM (extracts over /opt/superos-studio,
 #    preserves the VM's own docker-compose.yml and .env, rebuilds, restarts pm2).
@@ -84,6 +101,13 @@ echo "DEPLOY_DONE"
 ```
 
 **Always verify after deploying:**
+```bash
+# The deploy looked fine but shipped nothing: grep the VM for a string you just
+# added. This has caught a stale/partial deploy more than once.
+gcloud compute ssh superos-studio --zone=us-central1-a \
+  --command='grep -c "some string from your change" /opt/superos-studio/path/to/file.ts'
+```
+
 ```bash
 # pm2 all "online", restart count (↺) bumped by exactly 1 — confirms it actually redeployed.
 gcloud compute ssh superos-studio --zone=us-central1-a --command='pm2 list'
