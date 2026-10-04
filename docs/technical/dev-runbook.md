@@ -42,6 +42,60 @@ This project has been burned by assumed model ids before. Steps:
    keyed by the exact model id string used in step 2.
 6. Build and typecheck (see step 2 of Deploy) before shipping.
 
+## 1b. The VM is currently DELETED — restore it first
+
+As of 4 Oct 2026 there is no `superos-studio` instance, no disk and no static
+IP. The deployment was torn down because it was going unused. Everything is
+preserved in one snapshot:
+
+```
+superos-studio-final-20261004   READY   30GB disk   ~6.1GB stored
+```
+
+That snapshot holds the Postgres database (assets, runs, users, and the
+pgvector knowledge-base embeddings), the MinIO object store (every generated
+and uploaded asset) and — the part nothing else has a copy of —
+`/opt/superos-studio/.env` with the real production secrets. The deploy
+tarball has always excluded `.env`, so the repo does not contain it. Do not
+delete this snapshot unless the project is being abandoned.
+
+**To bring the deployment back:**
+
+```bash
+ZONE=us-central1-a
+
+# 1. Recreate the disk from the snapshot (same name as before).
+gcloud compute disks create superos-studio \
+  --source-snapshot=superos-studio-final-20261004 \
+  --type=pd-balanced --zone=$ZONE
+
+# 2. Recreate the VM on that disk. It was an e2-medium.
+gcloud compute instances create superos-studio \
+  --zone=$ZONE --machine-type=e2-medium \
+  --disk=name=superos-studio,boot=yes,auto-delete=yes
+
+# 3. The old static IP (34.136.154.80) was released, so the new VM gets a
+#    fresh ephemeral one. Get it and repoint studio.maturate.ai DNS at it:
+gcloud compute instances describe superos-studio --zone=$ZONE \
+  --format="value(networkInterfaces[0].accessConfigs[0].natIP)"
+
+#    Optionally reserve it so it survives the next stop:
+# gcloud compute addresses create superos-studio-ip --region=us-central1
+
+# 4. AUTH_URL in the VM's .env still points at studio.maturate.ai. Google
+#    OAuth redirect URIs are registered against that hostname, so sign-in
+#    stays broken until DNS points at the new IP.
+
+# 5. pm2 and docker (postgres/redis/minio) should come up on boot. Check:
+gcloud compute ssh superos-studio --zone=$ZONE --command='pm2 list; docker ps'
+```
+
+Note: the allowlist in that snapshot has exactly one active account,
+`vibhanshurathod32@gmail.com`. Every other address was deactivated on
+28 Sep 2026, so nobody else can sign in until a row is reactivated in
+`allowed_emails` (and `users.is_authorized`, which is what live sessions
+actually read).
+
 ## 2. Deploy code (to the `superos-studio` GCP VM)
 
 ```bash
